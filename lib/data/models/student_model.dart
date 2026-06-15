@@ -1,20 +1,18 @@
-// සිසුවාගේ තොරතුරු නියෝජනය කරන Data Model පන්තිය
+// සිසුවාගේ තොරතුරු නියෝජනය කරන Data Model පන්තිය (Firebase Firestore Version)
 class StudentModel {
-  final int? id;
+  final String? uid;      // Firebase Auth UID (Firestore Document ID ලෙසද භාවිතා කරනු ලැබේ)
   final String name;
   final String email;
-  final String password; // දත්ත ගබඩාවේ Authentication සඳහා
   final String school;   // පාසලේ නම
   final String grade;    // ශ්‍රේණිය (උදා: Grade 11)
-  final int oLevelYear;  // විභාගයට මුහුණ දෙන වසර (උදා: 2024)
+  final int oLevelYear;  // විභාගයට මුහුණ දෙන වසර (උදා: 2026)
   final int xp;          // සිසුවා ලබාගත් මුළු XP ලකුණු ප්‍රමාණය
   final double avgScore; // සිසුවාගේ සාමාන්‍ය ලකුණු ප්‍රතිශතය (Average Score %)
 
   StudentModel({
-    this.id,
+    this.uid,
     required this.name,
     required this.email,
-    required this.password,
     required this.school,
     required this.grade,
     required this.oLevelYear,
@@ -22,42 +20,38 @@ class StudentModel {
     this.avgScore = 0.0,
   });
 
-  // දත්ත SQLite දත්ත ගබඩාවට ඇතුළත් කිරීමට Map එකක් බවට පරිවර්තනය කිරීම (Serialization)
+  // Firestore දත්ත ගබඩාවට ඇතුළත් කිරීමට Map එකක් බවට පරිවර්තනය කිරීම (Serialization)
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
       'name': name,
       'email': email,
-      'password': password,
       'school': school,
       'grade': grade,
-      'o_level_year': oLevelYear,
+      'oLevelYear': oLevelYear,
       'xp': xp,
-      'avg_score': avgScore,
+      'avgScore': avgScore,
     };
   }
 
-  // SQLite දත්ත ගබඩාවෙන් ලැබෙන Map එකක් StudentModel වස්තුවක් බවට පරිවර්තනය කිරීම (Deserialization)
-  factory StudentModel.fromMap(Map<String, dynamic> map) {
+  // Firestore දත්ත ගබඩාවෙන් ලැබෙන Map එකක් StudentModel වස්තුවක් බවට පරිවර්තනය කිරීම (Deserialization)
+  factory StudentModel.fromMap(Map<String, dynamic> map, {String? uid}) {
     return StudentModel(
-      id: map['id'] as int?,
-      name: map['name'] as String,
-      email: map['email'] as String,
-      password: map['password'] as String,
-      school: map['school'] as String,
-      grade: map['grade'] as String,
-      oLevelYear: map['o_level_year'] as int,
-      xp: map['xp'] as int? ?? 0,
-      avgScore: (map['avg_score'] as num? ?? 0.0).toDouble(),
+      uid: uid ?? map['uid'] as String?,
+      name: map['name'] as String? ?? '',
+      email: map['email'] as String? ?? '',
+      school: map['school'] as String? ?? '',
+      grade: map['grade'] as String? ?? '',
+      oLevelYear: (map['oLevelYear'] as num?)?.toInt() ?? 2026,
+      xp: (map['xp'] as num?)?.toInt() ?? 0,
+      avgScore: (map['avgScore'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
   // සිසුවාගේ තොරතුරු වෙනස් කර Update කිරීමේදී (Edit Profile feature) භාවිතා කිරීමට copyWith ක්‍රමවේදය
   StudentModel copyWith({
-    int? id,
+    String? uid,
     String? name,
     String? email,
-    String? password,
     String? school,
     String? grade,
     int? oLevelYear,
@@ -65,10 +59,9 @@ class StudentModel {
     double? avgScore,
   }) {
     return StudentModel(
-      id: id ?? this.id,
+      uid: uid ?? this.uid,
       name: name ?? this.name,
       email: email ?? this.email,
-      password: password ?? this.password,
       school: school ?? this.school,
       grade: grade ?? this.grade,
       oLevelYear: oLevelYear ?? this.oLevelYear,

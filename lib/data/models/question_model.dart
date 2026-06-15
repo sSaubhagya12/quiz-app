@@ -1,14 +1,14 @@
-// විභාග ප්‍රශ්න සහ පිළිතුරු විකල්ප නියෝජනය කරන Data Model පන්තිය
+// විභාග ප්‍රශ්න සහ පිළිතුරු විකල්ප නියෝජනය කරන Data Model පන්තිය (Firebase Version)
 class QuestionModel {
-  final int? id;
-  final int subjectId;          // මෙම ප්‍රශ්නය අයත් වන විෂයයේ ID එක (Foreign Key)
-  final String questionText;    // ප්‍රශ්නයේ පෙළ (උදා: බලයේ ජාත්‍යන්තර ඒකකය කුමක්ද?)
-  final String option1;         // පිළිතුරු විකල්පය 1
-  final String option2;         // පිළිතුරු විකල්පය 2
-  final String option3;         // පිළිතුරු විකල්පය 3
-  final String option4;         // පිළිතුරු විකල්පය 4
-  final int correctOption;      // නිවැරදි පිළිතුරෙහි අංකය (1, 2, 3, හෝ 4)
-  final String explanation;     // පිළිතුර නිවැරදි වීමට හේතුව පැහැදිලි කරන විවරණය (Review Answer සඳහා)
+  final String? id;          // Firestore Document ID
+  final String subjectId;    // මෙම ප්‍රශ්නය අයත් වන විෂයයේ Firestore ID
+  final String questionText; // ප්‍රශ්නයේ පෙළ
+  final String option1;      // පිළිතුරු විකල්පය 1
+  final String option2;      // පිළිතුරු විකල්පය 2
+  final String option3;      // පිළිතුරු විකල්පය 3
+  final String option4;      // පිළිතුරු විකල්පය 4
+  final int correctOption;   // නිවැරදි පිළිතුරෙහි අංකය (1, 2, 3, හෝ 4)
+  final String explanation;  // පිළිතුර නිවැරදි වීමට හේතුව (Review Answer සඳහා)
 
   QuestionModel({
     this.id,
@@ -22,32 +22,31 @@ class QuestionModel {
     required this.explanation,
   });
 
-  // SQLite වෙතින් ලබාගන්නා Map එකක් QuestionModel වස්තුවක් බවට පත් කිරීම
-  factory QuestionModel.fromMap(Map<String, dynamic> map) {
+  // Firestore Document Snapshot වෙතින් QuestionModel සෑදීම
+  factory QuestionModel.fromMap(Map<String, dynamic> map, {String? id, String? subjectId}) {
     return QuestionModel(
-      id: map['id'] as int?,
-      subjectId: map['subject_id'] as int,
-      questionText: map['question_text'] as String,
-      option1: map['option_1'] as String,
-      option2: map['option_2'] as String,
-      option3: map['option_3'] as String,
-      option4: map['option_4'] as String,
-      correctOption: map['correct_option'] as int,
+      id: id ?? map['id'] as String?,
+      subjectId: subjectId ?? map['subjectId'] as String? ?? '',
+      questionText: map['questionText'] as String? ?? '',
+      option1: map['option1'] as String? ?? '',
+      option2: map['option2'] as String? ?? '',
+      option3: map['option3'] as String? ?? '',
+      option4: map['option4'] as String? ?? '',
+      correctOption: (map['correctOption'] as num?)?.toInt() ?? 1,
       explanation: map['explanation'] as String? ?? '',
     );
   }
 
-  // SQLite වෙත ඇතුළත් කිරීම සඳහා Map එකක් බවට හැරවීම
+  // Firestore වෙත ඇතුළත් කිරීම සඳහා Map එකක් බවට හැරවීම
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'subject_id': subjectId,
-      'question_text': questionText,
-      'option_1': option1,
-      'option_2': option2,
-      'option_3': option3,
-      'option_4': option4,
-      'correct_option': correctOption,
+      'subjectId': subjectId,
+      'questionText': questionText,
+      'option1': option1,
+      'option2': option2,
+      'option3': option3,
+      'option4': option4,
+      'correctOption': correctOption,
       'explanation': explanation,
     };
   }

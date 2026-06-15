@@ -14,11 +14,14 @@ dependencies:
   # State Management (ප්‍රාන්ත කළමනාකරණය සඳහා)
   provider: ^6.1.1
 
-  # Local SQLite Database (දේශීය දත්ත ගබඩාව සඳහා)
-  sqflite: ^2.3.0
+  # Firebase Core (Firebase Initialize කිරීමට)
+  firebase_core: ^3.6.0
 
-  # Path Helpers (දත්ත ගබඩා ගොනු මාර්ගය සඳහා)
-  path: ^1.8.3
+  # Firebase Authentication (Email/Password Login සඳහා)
+  firebase_auth: ^5.3.1
+
+  # Cloud Firestore (දත්ත ගබඩාව සඳහා)
+  cloud_firestore: ^5.4.4
 
   # Icons and Design elements (අයිකන සඳහා)
   cupertino_icons: ^1.0.6

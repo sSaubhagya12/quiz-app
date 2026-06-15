@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/student_model.dart';
@@ -23,6 +24,15 @@ class DatabaseHelper {
 
   // දත්ත ගබඩාව Initialize කිරීම
   Future<Database> _initDB(String filePath) async {
+    // Web platform හි getDatabasesPath() null වන නිසා filename directly use කිරීම
+    if (kIsWeb) {
+      return await openDatabase(
+        filePath,
+        version: 1,
+        onCreate: _createDB,
+      );
+    }
+
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 

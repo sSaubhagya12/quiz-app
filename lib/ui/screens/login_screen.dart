@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../logic/providers/auth_provider.dart';
+import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -29,7 +30,12 @@ class _LoginScreenState extends State<LoginScreen> {
     
     if (success) {
       if (mounted) {
-        Navigator.pop(context); 
+        // Clear entire stack and go to HomeScreen
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          (route) => false,
+        );
       }
     } else {
       if (mounted && authProvider.errorMessage != null) {

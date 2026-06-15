@@ -1,38 +1,37 @@
 import 'package:flutter/material.dart';
-import '../../data/database/database_helper.dart';
+import '../../data/firebase/firebase_service.dart';
 import '../../data/models/student_model.dart';
 
 // සිසුන්ගේ Authentication සහ Profile කටයුතු පාලනය කරන State Management පන්තිය
 class AuthProvider extends ChangeNotifier {
-  final DatabaseHelper _dbHelper = DatabaseHelper.instance;
+  final FirebaseService _firebaseService = FirebaseService.instance;
 
   StudentModel? _currentStudent; // දැනට ලොග් වී සිටින සිසුවාගේ තොරතුරු
-  bool _isLoading = false;      // Loading අවස්ථාවන් පෙන්වීමට (Progress Indicator සඳහා)
-  String? _errorMessage;         // කිසියම් දෝෂයක් ඇති වුවහොත් එය UI එකෙහි පෙන්වීමට
+  bool _isLoading = false;      // Loading අවස්ථාවන් (Progress Indicator)
+  String? _errorMessage;         // දෝෂ පණිවිඩ
 
-  // Getters මඟින් පිටතට දත්ත ලබාදීම
+  // Getters
   StudentModel? get currentStudent => _currentStudent;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   bool get isAuthenticated => _currentStudent != null;
 
   // ==========================================
-  // 1. STUDENT LOGIN LOGIC (ඇතුළු වීමේ පිටුව)
+  // 1. STUDENT LOGIN LOGIC (Firebase Auth)
   // ==========================================
   Future<bool> login(String email, String password) async {
     _setLoading(true);
     _clearError();
 
     try {
-      // Input Validation (හිස්තැන් පරීක්ෂා කිරීම)
-      if (email.trim().isEmpty || password.trim().isEmpty) {
-        _setError("කරුණාකර ඊමේල් ලිපිනය සහ මුරපදය ඇතුළත් කරන්න!");
-        _setLoading(false);
-        return false;
-      }
+      StudentModel? student;
 
-      // SQLite Authentication
-      final student = await _dbHelper.loginStudent(email.trim(), password);
+      // Fields හිස් නම් demo account ලෙස login කිරීම
+      if (email.trim().isEmpty && password.isEmpty) {
+        student = await _firebaseService.loginWithDemoAccount();
+      } else {
+        student = await _firebaseService.loginStudent(email, password);
+      }
 
       if (student != null) {
         _currentStudent = student;
@@ -40,50 +39,47 @@ class AuthProvider extends ChangeNotifier {
         notifyListeners();
         return true;
       } else {
-        _setError("ඇතුළත් කළ ඊමේල් ලිපිනය හෝ මුරපදය වැරදියි!");
+        _setError("Login කිරීමට නොහැකි විය. නැවත උත්සාහ කරන්න.");
         _setLoading(false);
         return false;
       }
     } catch (e) {
-      _setError("පද්ධතියේ දෝෂයක් පවතී: ${e.toString()}");
+      _setError(e.toString().replaceAll("Exception: ", ""));
       _setLoading(false);
       return false;
     }
   }
 
   // ==========================================
-  // 2. SIGN UP LOGIC (නව ගිණුමක් සෑදීමේ පිටුව)
+  // 2. SIGN UP LOGIC (Firebase Auth + Firestore)
   // ==========================================
-  Future<bool> register(StudentModel student) async {
+  Future<bool> register(StudentModel student, String password) async {
     _setLoading(true);
     _clearError();
 
     try {
       // Input Validation
-      if (student.name.trim().isEmpty || 
-          student.email.trim().isEmpty || 
-          student.password.trim().isEmpty || 
-          student.school.trim().isEmpty || 
+      if (student.name.trim().isEmpty ||
+          student.email.trim().isEmpty ||
+          password.trim().isEmpty ||
+          student.school.trim().isEmpty ||
           student.grade.trim().isEmpty) {
         _setError("කරුණාකර සියලුම අත්‍යවශ්‍ය තොරතුරු ඇතුළත් කරන්න!");
         _setLoading(false);
         return false;
       }
 
-      if (student.password.length < 8) {
-        _setError("මුරපදය සඳහා අවම වශයෙන් අකුරු 8ක් තිබිය යුතුය!");
+      if (password.length < 6) {
+        _setError("මුරපදය සඳහා අවම වශයෙන් අකුරු 6ක් තිබිය යුතුය!");
         _setLoading(false);
         return false;
       }
 
-      // SQLite හි තැන්පත් කිරීම
-      await _dbHelper.registerStudent(student);
-      
+      // Firebase Auth + Firestore
+      final uid = await _firebaseService.registerStudent(student, password);
+
       // ලියාපදිංචි වූ සැනින් ස්වයංක්‍රීයව ලොග් කර ගැනීම
-      final loggedInStudent = await _dbHelper.loginStudent(student.email, student.password);
-      if (loggedInStudent != null) {
-        _currentStudent = loggedInStudent;
-      }
+      _currentStudent = student.copyWith(uid: uid);
 
       _setLoading(false);
       notifyListeners();
@@ -96,7 +92,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   // ==========================================
-  // 3. EDIT PROFILE LOGIC (පැතිකඩ යාවත්කාලීන කිරීමේ පිටුව)
+  // 3. EDIT PROFILE LOGIC (Firestore Update)
   // ==========================================
   Future<bool> updateProfile({
     required String name,
@@ -116,7 +112,6 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
 
-      // වත්මන් සිසුවාගේ දත්ත වෙනස් කර නව වස්තුවක් සාදා ගැනීම
       final updatedStudent = _currentStudent!.copyWith(
         name: name.trim(),
         school: school.trim(),
@@ -124,19 +119,11 @@ class AuthProvider extends ChangeNotifier {
         oLevelYear: oLevelYear,
       );
 
-      // දත්ත ගබඩාවේ Update කිරීම
-      final rowsAffected = await _dbHelper.updateStudentProfile(updatedStudent);
-
-      if (rowsAffected > 0) {
-        _currentStudent = updatedStudent;
-        _setLoading(false);
-        notifyListeners();
-        return true;
-      } else {
-        _setError("තොරතුරු යාවත්කාලීන කිරීමට නොහැකි විය!");
-        _setLoading(false);
-        return false;
-      }
+      await _firebaseService.updateStudentProfile(updatedStudent);
+      _currentStudent = updatedStudent;
+      _setLoading(false);
+      notifyListeners();
+      return true;
     } catch (e) {
       _setError("දෝෂයක් සිදුවිය: ${e.toString()}");
       _setLoading(false);
@@ -145,14 +132,14 @@ class AuthProvider extends ChangeNotifier {
   }
 
   // ==========================================
-  // 4. GENERAL HELPER METHODS (සාමාන්‍ය සහායක ක්‍රම)
+  // 4. GENERAL HELPER METHODS
   // ==========================================
 
-  // සිසුවා ක්විස් එකක් කළ පසු, ඔහුගේ XP/Avg Score දත්ත ගබඩාවෙන් නැවත කියවා UI එක update කිරීමට
+  // ක්විස් එකක් කළ පසු Student Stats refresh කිරීම
   Future<void> refreshStudentStats() async {
-    if (_currentStudent == null) return;
-    
-    final updatedData = await _dbHelper.getStudentById(_currentStudent!.id!);
+    if (_currentStudent?.uid == null) return;
+
+    final updatedData = await _firebaseService.getStudentByUid(_currentStudent!.uid!);
     if (updatedData != null) {
       _currentStudent = updatedData;
       notifyListeners();
@@ -160,7 +147,8 @@ class AuthProvider extends ChangeNotifier {
   }
 
   // ගිණුමෙන් ඉවත් වීම (Log Out)
-  void logout() {
+  Future<void> logout() async {
+    await _firebaseService.signOut();
     _currentStudent = null;
     _clearError();
     notifyListeners();
@@ -175,6 +163,7 @@ class AuthProvider extends ChangeNotifier {
   // දෝෂ පණිවිඩ සටහන් කිරීම
   void _setError(String message) {
     _errorMessage = message;
+    notifyListeners();
   }
 
   // පැරණි දෝෂ ඉවත් කිරීම

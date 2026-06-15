@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../logic/providers/auth_provider.dart';
 import '../../data/models/student_model.dart';
+import 'home_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -45,17 +46,21 @@ class _SignupScreenState extends State<SignupScreen> {
     final newStudent = StudentModel(
       name: _nameController.text,
       email: _emailController.text,
-      password: _passwordController.text,
       school: _schoolController.text,
       grade: _gradeController.text,
       oLevelYear: oLevelYear,
     );
 
-    final success = await authProvider.register(newStudent);
+    final success = await authProvider.register(newStudent, _passwordController.text);
     
     if (success) {
       if (mounted) {
-        Navigator.pop(context); // Go back to Welcome screen, which will redirect to Home
+        // Clear entire stack and go to HomeScreen
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          (route) => false,
+        );
       }
     } else {
       if (mounted && authProvider.errorMessage != null) {

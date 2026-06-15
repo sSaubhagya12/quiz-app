@@ -1,12 +1,12 @@
-// සිසුවා ලබාගත් අවසාන ලකුණු සහ ප්‍රතිඵල විස්තර නියෝජනය කරන Data Model පන්තිය
+// සිසුවා ලබාගත් අවසාන ලකුණු සහ ප්‍රතිඵල විස්තර නියෝජනය කරන Data Model පන්තිය (Firebase Version)
 class QuizResultModel {
-  final int? id;
-  final int studentId;       // ක්විස් එකට මුහුණ දුන් සිසුවාගේ ID එක (Foreign Key)
-  final int subjectId;       // අදාළ විෂයෙහි ID එක (Foreign Key)
-  final int score;           // නිවැරදි පිළිතුරු සංඛ්‍යාව (උදා: 32)
-  final int totalQuestions;  // මුළු ප්‍රශ්න සංඛ්‍යාව (උදා: 40)
-  final int timeSpent;       // ක්විස් එක සඳහා ගතවූ කාලය - තත්පර වලින් (උදා: 1122 තත්පර = විනාඩි 18:42)
-  final String dateTaken;    // ක්විස් එකට මුහුණ දුන් දිනය සහ වේලාව
+  final String? id;          // Firestore Document ID
+  final String studentId;    // ක්විස් එකට මුහුණ දුන් සිසුවාගේ UID (Firebase Auth)
+  final String subjectId;    // අදාළ විෂයෙහි Firestore Document ID
+  final int score;           // නිවැරදි පිළිතුරු සංඛ්‍යාව
+  final int totalQuestions;  // මුළු ප්‍රශ්න සංඛ්‍යාව
+  final int timeSpent;       // ක්විස් එකට ගතවූ කාලය (තත්පර)
+  final String dateTaken;    // ක්විස් එකට මුහුණ දුන් දිනය
 
   QuizResultModel({
     this.id,
@@ -18,29 +18,28 @@ class QuizResultModel {
     required this.dateTaken,
   });
 
-  // SQLite වෙතින් ලබාගන්නා Map එකක් QuizResultModel වස්තුවක් බවට පත් කිරීම
-  factory QuizResultModel.fromMap(Map<String, dynamic> map) {
+  // Firestore Document Snapshot වෙතින් QuizResultModel සෑදීම
+  factory QuizResultModel.fromMap(Map<String, dynamic> map, {String? id}) {
     return QuizResultModel(
-      id: map['id'] as int?,
-      studentId: map['student_id'] as int,
-      subjectId: map['subject_id'] as int,
-      score: map['score'] as int,
-      totalQuestions: map['total_questions'] as int,
-      timeSpent: map['time_spent'] as int,
-      dateTaken: map['date_taken'] as String,
+      id: id ?? map['id'] as String?,
+      studentId: map['studentId'] as String? ?? '',
+      subjectId: map['subjectId'] as String? ?? '',
+      score: (map['score'] as num?)?.toInt() ?? 0,
+      totalQuestions: (map['totalQuestions'] as num?)?.toInt() ?? 0,
+      timeSpent: (map['timeSpent'] as num?)?.toInt() ?? 0,
+      dateTaken: map['dateTaken'] as String? ?? DateTime.now().toIso8601String(),
     );
   }
 
-  // SQLite වෙත ඇතුළත් කිරීම සඳහා Map එකක් බවට හැරවීම
+  // Firestore වෙත ඇතුළත් කිරීම සඳහා Map එකක් බවට හැරවීම
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'student_id': studentId,
-      'subject_id': subjectId,
+      'studentId': studentId,
+      'subjectId': subjectId,
       'score': score,
-      'total_questions': totalQuestions,
-      'time_spent': timeSpent,
-      'date_taken': dateTaken,
+      'totalQuestions': totalQuestions,
+      'timeSpent': timeSpent,
+      'dateTaken': dateTaken,
     };
   }
 

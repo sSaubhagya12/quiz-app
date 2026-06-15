@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'firebase_options.dart';
 import 'logic/providers/auth_provider.dart';
 import 'logic/providers/subject_provider.dart';
 import 'logic/providers/quiz_provider.dart';
 import 'ui/screens/login_screen.dart';
 import 'ui/screens/signup_screen.dart';
+import 'ui/screens/home_screen.dart';
 
-void main() {
-  // SQLite Database එක නිවැරදිව Initialize වීම සහතික කිරීම
+void main() async {
+  // Firebase Initialize කිරීම
   WidgetsFlutterBinding.ensureInitialized();
-  
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(
-    // MultiProvider මඟින් ඇප් එක ආරම්භයේදීම අපගේ Providers 3ම ලියාපදිංචි කිරීම
+    // MultiProvider මඟින් ඇප් එක ආරම්භයේදීම Providers ලියාපදිංචි කිරීම
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
@@ -33,21 +39,17 @@ class EduQuizApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        // සාමාන්‍ය පෙළ සිසුන් කැමති වන අලංකාර වර්ණ පද්ධතියක් (Color Palette)
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1E3C72), // Premium Deep Blue වර්ණය
+          seedColor: const Color(0xFF1E3C72),
           primary: const Color(0xFF1E3C72),
-          secondary: const Color(0xFFF2994A), // Orange Accent වර්ණය
-          surface: const Color(0xFFF8F9FA), // Soft grey background
+          secondary: const Color(0xFFF2994A),
+          surface: const Color(0xFFF8F9FA),
         ),
-        // අකුරු (Typography) සැකසීම
         textTheme: const TextTheme(
           titleLarge: TextStyle(fontWeight: FontWeight.bold, fontSize: 22, color: Color(0xFF1E3C72)),
           bodyMedium: TextStyle(fontSize: 16, color: Colors.black87),
         ),
       ),
-      // ආරම්භක පිටුව ලෙස Login Page එක හෝ Home Page එක දැක්විය හැක.
-      // මෙහිදී, සිසුවා දැනටමත් ලොග් වී ඇත්නම් කෙලින්ම Home Page එකට යාමට සකස් කළ හැක.
       home: const WelcomeOrLoginPage(),
     );
   }
@@ -59,20 +61,11 @@ class WelcomeOrLoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // AuthProvider එක සජීවීව නිරීක්ෂණය කිරීම
+    // AuthProvider නිරීක්ෂණය - authenticated නම් HomeScreen, නැත්නම් Welcome
     final authProvider = context.watch<AuthProvider>();
 
-    // සිසුවා දැනටමත් ලොග් වී ඇත්නම් කෙලින්ම Home Page එක පෙන්වයි.
-    // ලොග් වී නොමැති නම් Login Page එක පෙන්වයි.
     if (authProvider.isAuthenticated) {
-      return const Scaffold(
-        body: Center(
-          child: Text(
-            "සාර්ථකව ඇතුළු විය! මෙතැන් සිට Home Screen එක Load වේ.",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-        ),
-      );
+      return const HomeScreen();
     }
 
     return Scaffold(
