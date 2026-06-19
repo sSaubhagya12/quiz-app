@@ -112,22 +112,38 @@ class _ChooseSubjectScreenState extends State<ChooseSubjectScreen> {
   // ── Icon mapping ─────────────────────────────────────────────────────────────
   IconData _getIcon(String iconName) {
     switch (iconName) {
-      case 'science': return Icons.science_rounded;
-      case 'calculate': return Icons.calculate_rounded;
-      case 'book': return Icons.book_rounded;
-      case 'history': return Icons.history_edu_rounded;
-      case 'language': return Icons.language_rounded;
-      case 'public': return Icons.public_rounded;
-      case 'volunteer_activism': return Icons.volunteer_activism_rounded;
-      case 'analytics': return Icons.analytics_rounded;
-      case 'gavel': return Icons.gavel_rounded;
-      case 'music_note': return Icons.music_note_rounded;
-      case 'emoji_people': return Icons.emoji_people_rounded;
-      case 'palette': return Icons.palette_rounded;
-      case 'computer': return Icons.computer_rounded;
-      case 'agriculture': return Icons.agriculture_rounded;
-      case 'fitness_center': return Icons.fitness_center_rounded;
-      default: return Icons.school_rounded;
+      case 'science':
+        return Icons.science_rounded;
+      case 'calculate':
+        return Icons.calculate_rounded;
+      case 'book':
+        return Icons.book_rounded;
+      case 'history':
+        return Icons.history_edu_rounded;
+      case 'language':
+        return Icons.language_rounded;
+      case 'public':
+        return Icons.public_rounded;
+      case 'volunteer_activism':
+        return Icons.volunteer_activism_rounded;
+      case 'analytics':
+        return Icons.analytics_rounded;
+      case 'gavel':
+        return Icons.gavel_rounded;
+      case 'music_note':
+        return Icons.music_note_rounded;
+      case 'emoji_people':
+        return Icons.emoji_people_rounded;
+      case 'palette':
+        return Icons.palette_rounded;
+      case 'computer':
+        return Icons.computer_rounded;
+      case 'agriculture':
+        return Icons.agriculture_rounded;
+      case 'fitness_center':
+        return Icons.fitness_center_rounded;
+      default:
+        return Icons.school_rounded;
     }
   }
 
@@ -215,31 +231,41 @@ class _ChooseSubjectScreenState extends State<ChooseSubjectScreen> {
                 PopupMenuButton<String>(
                   onSelected: _onLangChanged,
                   color: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
                   itemBuilder: (_) => [
-                    const PopupMenuItem(value: 'si', child: Text('සිංහල (Sinhala)')),
+                    const PopupMenuItem(
+                        value: 'si', child: Text('සිංහල (Sinhala)')),
                     const PopupMenuItem(value: 'en', child: Text('English')),
-                    const PopupMenuItem(value: 'ta', child: Text('Tamil (Sri Lanka)')),
+                    const PopupMenuItem(
+                        value: 'ta', child: Text('Tamil (Sri Lanka)')),
                   ],
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.45)),
+                      border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.45)),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          _langCode == 'en' ? 'ENG' : _langCode == 'si' ? 'සිං' : 'தமிழ்',
+                          _langCode == 'en'
+                              ? 'ENG'
+                              : _langCode == 'si'
+                                  ? 'සිං'
+                                  : 'தமிழ்',
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
                           ),
                         ),
-                        const Icon(Icons.arrow_drop_down, color: Colors.white, size: 18),
+                        const Icon(Icons.arrow_drop_down,
+                            color: Colors.white, size: 18),
                       ],
                     ),
                   ),
@@ -258,9 +284,11 @@ class _ChooseSubjectScreenState extends State<ChooseSubjectScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.18),
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.45)),
+                      border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.45)),
                     ),
-                    child: const Icon(Icons.person_outline_rounded, color: Colors.white, size: 22),
+                    child: const Icon(Icons.person_outline_rounded,
+                        color: Colors.white, size: 22),
                   ),
                 ),
               ],
@@ -298,7 +326,8 @@ class _ChooseSubjectScreenState extends State<ChooseSubjectScreen> {
                     prefixIcon: Icon(Icons.search_rounded, color: textPrimary),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.close_rounded, color: Colors.grey),
+                            icon: const Icon(Icons.close_rounded,
+                                color: Colors.grey),
                             onPressed: () {
                               _searchController.clear();
                               setState(() => _searchQuery = '');
@@ -349,8 +378,7 @@ class _ChooseSubjectScreenState extends State<ChooseSubjectScreen> {
                         ),
                       )
                     : GridView.builder(
-                        padding:
-                            const EdgeInsets.fromLTRB(16, 0, 16, 20),
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
                         itemCount: filtered.length,
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
@@ -425,12 +453,10 @@ class _SubjectCard extends StatelessWidget {
     required this.onTap,
   });
 
-
   @override
   Widget build(BuildContext context) {
     // When searching: highlighted = full color, non-highlighted = faded
-    final double cardOpacity =
-        hasSearch && !isHighlighted ? 0.45 : 1.0;
+    final double cardOpacity = hasSearch && !isHighlighted ? 0.45 : 1.0;
 
     return AnimatedOpacity(
       opacity: cardOpacity,
@@ -462,7 +488,8 @@ class _SubjectCard extends StatelessWidget {
               Expanded(
                 flex: 5,
                 child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(16)),
                   child: subject.imageUrl != null
                       ? Image.network(
                           subject.imageUrl!,
@@ -473,7 +500,8 @@ class _SubjectCard extends StatelessWidget {
                               color: const Color(0xFFF0F4FF),
                               child: Center(
                                 child: Icon(icon,
-                                    color: const Color(0xFF1E3C72).withValues(alpha: 0.3),
+                                    color: const Color(0xFF1E3C72)
+                                        .withValues(alpha: 0.3),
                                     size: 32),
                               ),
                             );
@@ -481,14 +509,16 @@ class _SubjectCard extends StatelessWidget {
                           errorBuilder: (_, __, ___) => Container(
                             color: const Color(0xFFF0F4FF),
                             child: Center(
-                              child: Icon(icon, color: const Color(0xFF1E3C72), size: 32),
+                              child: Icon(icon,
+                                  color: const Color(0xFF1E3C72), size: 32),
                             ),
                           ),
                         )
                       : Container(
                           color: const Color(0xFFF0F4FF),
                           child: Center(
-                            child: Icon(icon, color: const Color(0xFF1E3C72), size: 32),
+                            child: Icon(icon,
+                                color: const Color(0xFF1E3C72), size: 32),
                           ),
                         ),
                 ),
@@ -498,7 +528,8 @@ class _SubjectCard extends StatelessWidget {
               Expanded(
                 flex: 5,
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -521,7 +552,8 @@ class _SubjectCard extends StatelessWidget {
                         children: [
                           Icon(Icons.help_outline_rounded,
                               size: 13,
-                              color: const Color(0xFF2A5298).withValues(alpha: 0.8)),
+                              color: const Color(0xFF2A5298)
+                                  .withValues(alpha: 0.8)),
                           const SizedBox(width: 4),
                           Text(
                             '30 $questionsLabel',
@@ -539,7 +571,8 @@ class _SubjectCard extends StatelessWidget {
                         children: [
                           Icon(Icons.timer_outlined,
                               size: 13,
-                              color: const Color(0xFF27AE60).withValues(alpha: 0.9)),
+                              color: const Color(0xFF27AE60)
+                                  .withValues(alpha: 0.9)),
                           const SizedBox(width: 4),
                           Text(
                             '$timeLabel 45:00',
