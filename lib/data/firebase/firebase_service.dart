@@ -385,8 +385,13 @@ class FirebaseService {
   Future<bool> emailExists(String email) async {
     if (_isOfflineMode) return false;
     try {
-      final methods = await _auth.fetchSignInMethodsForEmail(email.trim());
-      return methods.isNotEmpty;
+      // Use Firestore query instead of deprecated fetchSignInMethodsForEmail
+      final snap = await _db
+          .collection('users')
+          .where('email', isEqualTo: email.trim())
+          .limit(1)
+          .get();
+      return snap.docs.isNotEmpty;
     } catch (_) {
       return false;
     }
@@ -424,7 +429,7 @@ class FirebaseService {
     if (_isOfflineMode) {
       if (_offlineStudent != null) {
         _offlineStudent = _offlineStudent!.copyWith(
-          xp: (_offlineStudent!.xp ?? 0) + additionalXp,
+          xp: _offlineStudent!.xp + additionalXp,
           avgScore: newAvgScore,
         );
       }

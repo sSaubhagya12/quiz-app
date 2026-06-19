@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../logic/providers/auth_provider.dart';
 import '../../logic/providers/subject_provider.dart';
 import '../../logic/providers/quiz_provider.dart';
+import '../../logic/providers/theme_provider.dart';
 import 'choose_subject_screen.dart';
 import 'profile_screen.dart';
 import 'quiz_screen.dart';
@@ -37,6 +38,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
     final student = authProvider.currentStudent;
+    final themeProvider = context.watch<ThemeProvider>();
+    final isDark = themeProvider.isDarkMode;
 
     final List<Widget> pages = [
       _HomeDashboard(
@@ -44,20 +47,29 @@ class _HomeScreenState extends State<HomeScreen> {
         langCode: _selectedLanguageCode,
         onLanguageChanged: _onLanguageChanged,
         onViewAllSubjects: () => setState(() => _selectedIndex = 1),
+        isDark: isDark,
       ),
-      const ChooseSubjectScreen(isEmbedded: true),
-      const ProfileScreen(isEmbedded: true),
+      ChooseSubjectScreen(
+        isEmbedded: true,
+        initialLangCode: _selectedLanguageCode,
+        onLanguageChanged: _onLanguageChanged,
+      ),
+      ProfileScreen(
+        isEmbedded: true,
+        initialLangCode: _selectedLanguageCode,
+        onLanguageChanged: _onLanguageChanged,
+      ),
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FC),
+      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF4F6FC),
       body: pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (i) => setState(() => _selectedIndex = i),
-        selectedItemColor: const Color(0xFF1E3C72),
+        selectedItemColor: isDark ? Colors.lightBlueAccent : const Color(0xFF1E3C72),
         unselectedItemColor: Colors.grey,
-        backgroundColor: Colors.white,
+        backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         elevation: 10,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Home'),
@@ -69,18 +81,33 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _HomeDashboard extends StatelessWidget {
+class _HomeDashboard extends StatefulWidget {
   final dynamic student;
   final String langCode;
   final ValueChanged<String> onLanguageChanged;
   final VoidCallback onViewAllSubjects;
+  final bool isDark;
 
   const _HomeDashboard({
     required this.student,
     required this.langCode,
     required this.onLanguageChanged,
     required this.onViewAllSubjects,
+    required this.isDark,
   });
+
+  @override
+  State<_HomeDashboard> createState() => _HomeDashboardState();
+}
+
+class _HomeDashboardState extends State<_HomeDashboard> {
+  bool _showAllContinueLearning = false;
+
+  // Forward all getters to widget for convenience
+  String get langCode => widget.langCode;
+  ValueChanged<String> get onLanguageChanged => widget.onLanguageChanged;
+  VoidCallback get onViewAllSubjects => widget.onViewAllSubjects;
+  bool get isDark => widget.isDark;
 
   // Translation mapping
   static const Map<String, Map<String, String>> _translations = {
@@ -232,12 +259,18 @@ class _HomeDashboard extends StatelessWidget {
     final hasOngoingQuiz = quizProvider.currentSubject != null && !quizProvider.isQuizCompleted;
     final subjects = subjectProvider.subjects;
 
-    // Filtered subjects for "Continue Learning" (either in-progress or some recommended fallbacks)
-    final continueLearningSubjects = subjects.where((s) => s.completedRate > 0.0).toList();
-    if (continueLearningSubjects.isEmpty && subjects.isNotEmpty) {
-      // Show first 3 subjects as fallback
-      continueLearningSubjects.addAll(subjects.take(3));
-    }
+    // Dark mode colors
+    final cardBg = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+    final textPrimary = isDark ? Colors.white : const Color(0xFF1E3C72);
+
+    // Continue Learning: always use all subjects
+    final allContinueLearning = subjects;
+    // Show first 5 initially; expand to all when _showAllContinueLearning is true
+    const int initialCount = 5;
+    final displayedContinue = _showAllContinueLearning
+        ? allContinueLearning
+        : allContinueLearning.take(initialCount).toList();
+    final hasMore = allContinueLearning.length > initialCount;
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -249,19 +282,24 @@ class _HomeDashboard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    const Icon(Icons.menu_rounded, color: Color(0xFF1E3C72), size: 28),
-                    const SizedBox(width: 8),
-                    Text(
-                      _t('heading'),
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1E3C72),
+                Expanded(
+                  child: Row(
+                    children: [
+                      Icon(Icons.menu_rounded, color: textPrimary, size: 28),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          _t('heading'),
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: textPrimary,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 Row(
                   children: [
@@ -465,10 +503,10 @@ class _HomeDashboard extends StatelessWidget {
             // 3. Continue Learning Section
             Text(
               _t('continue_learning'),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1E3C72),
+                color: textPrimary,
               ),
             ),
             const SizedBox(height: 12),
@@ -477,18 +515,19 @@ class _HomeDashboard extends StatelessWidget {
               height: 160,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: continueLearningSubjects.length + 1, // +1 for the "more" card
+                // show more card only when not expanded AND there are hidden subjects
+                itemCount: displayedContinue.length + ((!_showAllContinueLearning && hasMore) ? 1 : 0),
                 itemBuilder: (context, index) {
-                  if (index == continueLearningSubjects.length) {
-                    // Rightmost "more" card
+                  if (!_showAllContinueLearning && hasMore && index == displayedContinue.length) {
+                    // "more" card — expands inline, no navigation
                     return Container(
                       width: 100,
                       margin: const EdgeInsets.only(right: 8, bottom: 8),
                       child: InkWell(
-                        onTap: onViewAllSubjects,
+                        onTap: () => setState(() => _showAllContinueLearning = true),
                         borderRadius: BorderRadius.circular(14),
                         child: Card(
-                          color: Colors.white,
+                          color: cardBg,
                           elevation: 3,
                           shadowColor: Colors.black.withValues(alpha: 0.1),
                           shape: RoundedRectangleBorder(
@@ -512,10 +551,10 @@ class _HomeDashboard extends StatelessWidget {
                               const SizedBox(height: 8),
                               Text(
                                 _t('more'),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF1E3C72),
+                                  color: textPrimary,
                                 ),
                               ),
                             ],
@@ -525,7 +564,7 @@ class _HomeDashboard extends StatelessWidget {
                     );
                   }
 
-                  final subject = continueLearningSubjects[index];
+                  final subject = displayedContinue[index];
                   return Container(
                     width: 140,
                     margin: const EdgeInsets.only(right: 12, bottom: 8),

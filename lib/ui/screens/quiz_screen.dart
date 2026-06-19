@@ -46,7 +46,8 @@ class _QuizScreenState extends State<QuizScreen> {
     if (quizProvider.errorMessage != null && quizProvider.questions.isEmpty) {
       return Scaffold(
         appBar: AppBar(
-          title: Text(widget.subject.name, style: const TextStyle(color: Colors.white)),
+          title: Text(widget.subject.name,
+              style: const TextStyle(color: Colors.white)),
           backgroundColor: const Color(0xFF1E3C72),
           iconTheme: const IconThemeData(color: Colors.white),
         ),
@@ -92,14 +93,16 @@ class _QuizScreenState extends State<QuizScreen> {
       backgroundColor: const Color(0xFFF0F4FF),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1E3C72),
-        title: Text(widget.subject.name, style: const TextStyle(color: Colors.white)),
+        title: Text(widget.subject.name,
+            style: const TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: Row(
               children: [
-                const Icon(Icons.timer_rounded, color: Colors.white70, size: 18),
+                const Icon(Icons.timer_rounded,
+                    color: Colors.white70, size: 18),
                 const SizedBox(width: 4),
                 Text(
                   quizProvider.formattedTime,
@@ -121,7 +124,8 @@ class _QuizScreenState extends State<QuizScreen> {
                 children: [
                   Text(
                     'Question $current of $total',
-                    style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF1E3C72)),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w600, color: Color(0xFF1E3C72)),
                   ),
                   const Spacer(),
                   Text(
@@ -198,7 +202,8 @@ class _QuizScreenState extends State<QuizScreen> {
                   itemCount: options.length,
                   itemBuilder: (context, index) {
                     final optionNumber = index + 1;
-                    final isSelected = quizProvider.selectedOption == optionNumber;
+                    final isSelected =
+                        quizProvider.selectedOption == optionNumber;
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: GestureDetector(
@@ -207,14 +212,20 @@ class _QuizScreenState extends State<QuizScreen> {
                           duration: const Duration(milliseconds: 200),
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: isSelected ? const Color(0xFF1E3C72) : Colors.white,
+                            color: isSelected
+                                ? const Color(0xFF1E3C72)
+                                : Colors.white,
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(
-                              color: isSelected ? const Color(0xFF1E3C72) : Colors.grey.shade200,
+                              color: isSelected
+                                  ? const Color(0xFF1E3C72)
+                                  : Colors.grey.shade200,
                               width: isSelected ? 2 : 1,
                             ),
                             boxShadow: [
-                              BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 6),
+                              BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.05),
+                                  blurRadius: 6),
                             ],
                           ),
                           child: Row(
@@ -223,15 +234,21 @@ class _QuizScreenState extends State<QuizScreen> {
                                 width: 32,
                                 height: 32,
                                 decoration: BoxDecoration(
-                                  color: isSelected ? Colors.white : const Color(0xFF1E3C72).withValues(alpha: 0.1),
+                                  color: isSelected
+                                      ? Colors.white
+                                      : const Color(0xFF1E3C72)
+                                          .withValues(alpha: 0.1),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Center(
                                   child: Text(
-                                    String.fromCharCode(65 + index), // A, B, C, D
+                                    String.fromCharCode(
+                                        65 + index), // A, B, C, D
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      color: isSelected ? const Color(0xFF1E3C72) : const Color(0xFF1E3C72),
+                                      color: isSelected
+                                          ? const Color(0xFF1E3C72)
+                                          : const Color(0xFF1E3C72),
                                     ),
                                   ),
                                 ),
@@ -242,13 +259,18 @@ class _QuizScreenState extends State<QuizScreen> {
                                   options[index],
                                   style: TextStyle(
                                     fontSize: 15,
-                                    color: isSelected ? Colors.white : Colors.black87,
-                                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                                    color: isSelected
+                                        ? Colors.white
+                                        : Colors.black87,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.normal,
                                   ),
                                 ),
                               ),
                               if (isSelected)
-                                const Icon(Icons.check_circle_rounded, color: Colors.white, size: 22),
+                                const Icon(Icons.check_circle_rounded,
+                                    color: Colors.white, size: 22),
                             ],
                           ),
                         ),
@@ -269,18 +291,23 @@ class _QuizScreenState extends State<QuizScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF1E3C72),
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
                     elevation: 4,
                   ),
                   child: quizProvider.isLoading
                       ? const SizedBox(
                           width: 24,
                           height: 24,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white),
                         )
                       : Text(
-                          current == total ? 'Submit Quiz ✓' : 'Next Question →',
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          current == total
+                              ? 'Submit Quiz ✓'
+                              : 'Next Question →',
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                 ),
               ),

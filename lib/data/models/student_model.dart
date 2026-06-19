@@ -8,6 +8,8 @@ class StudentModel {
   final int oLevelYear;  // විභාගයට මුහුණ දෙන වසර (උදා: 2026)
   final int xp;          // සිසුවා ලබාගත් මුළු XP ලකුණු ප්‍රමාණය
   final double avgScore; // සිසුවාගේ සාමාන්‍ය ලකුණු ප්‍රතිශතය (Average Score %)
+  final String phone;    // දුරකතන අංකය
+  final String photoUrl; // ප්‍රොෆයිල් පින්තූරයේ URL එක
 
   StudentModel({
     this.uid,
@@ -18,6 +20,8 @@ class StudentModel {
     required this.oLevelYear,
     this.xp = 0,
     this.avgScore = 0.0,
+    this.phone = '+94 74 0910955',
+    this.photoUrl = '',
   });
 
   // Firestore දත්ත ගබඩාවට ඇතුළත් කිරීමට Map එකක් බවට පරිවර්තනය කිරීම (Serialization)
@@ -30,6 +34,8 @@ class StudentModel {
       'oLevelYear': oLevelYear,
       'xp': xp,
       'avgScore': avgScore,
+      'phone': phone,
+      'photoUrl': photoUrl,
     };
   }
 
@@ -44,10 +50,12 @@ class StudentModel {
       oLevelYear: (map['oLevelYear'] as num?)?.toInt() ?? 2026,
       xp: (map['xp'] as num?)?.toInt() ?? 0,
       avgScore: (map['avgScore'] as num?)?.toDouble() ?? 0.0,
+      phone: map['phone'] as String? ?? '+94 74 0910955',
+      photoUrl: map['photoUrl'] as String? ?? '',
     );
   }
 
-  // සිසුවාගේ තොරතුරු වෙනස් කර Update කිරීමේදී (Edit Profile feature) භාවිතා කිරීමට copyWith ක්‍රමවේදය
+  // copyWith ක්‍රමවේදය
   StudentModel copyWith({
     String? uid,
     String? name,
@@ -57,6 +65,8 @@ class StudentModel {
     int? oLevelYear,
     int? xp,
     double? avgScore,
+    String? phone,
+    String? photoUrl,
   }) {
     return StudentModel(
       uid: uid ?? this.uid,
@@ -67,6 +77,8 @@ class StudentModel {
       oLevelYear: oLevelYear ?? this.oLevelYear,
       xp: xp ?? this.xp,
       avgScore: avgScore ?? this.avgScore,
+      phone: phone ?? this.phone,
+      photoUrl: photoUrl ?? this.photoUrl,
     );
   }
 }

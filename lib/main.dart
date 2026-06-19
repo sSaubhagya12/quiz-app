@@ -5,6 +5,7 @@ import 'firebase_options.dart';
 import 'logic/providers/auth_provider.dart';
 import 'logic/providers/subject_provider.dart';
 import 'logic/providers/quiz_provider.dart';
+import 'logic/providers/theme_provider.dart';
 import 'ui/screens/login_screen.dart';
 import 'ui/screens/signup_screen.dart';
 import 'ui/screens/home_screen.dart';
@@ -23,6 +24,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => SubjectProvider()),
         ChangeNotifierProvider(create: (_) => QuizProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: const EduQuizApp(),
     ),
@@ -34,11 +36,14 @@ class EduQuizApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
     return MaterialApp(
       title: 'O/L Quiz App',
       debugShowCheckedModeBanner: false,
+      themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
       theme: ThemeData(
         useMaterial3: true,
+        brightness: Brightness.light,
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF1E3C72),
           primary: const Color(0xFF1E3C72),
@@ -48,6 +53,20 @@ class EduQuizApp extends StatelessWidget {
         textTheme: const TextTheme(
           titleLarge: TextStyle(fontWeight: FontWeight.bold, fontSize: 22, color: Color(0xFF1E3C72)),
           bodyMedium: TextStyle(fontSize: 16, color: Colors.black87),
+        ),
+      ),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(
+          brightness: Brightness.dark,
+          seedColor: const Color(0xFF1E3C72),
+          primary: const Color(0xFF1E3C72),
+          secondary: const Color(0xFFF2994A),
+        ),
+        textTheme: const TextTheme(
+          titleLarge: TextStyle(fontWeight: FontWeight.bold, fontSize: 22, color: Colors.white),
+          bodyMedium: TextStyle(fontSize: 16, color: Colors.white70),
         ),
       ),
       home: const WelcomeOrLoginPage(),

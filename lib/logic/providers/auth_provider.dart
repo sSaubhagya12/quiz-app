@@ -99,6 +99,8 @@ class AuthProvider extends ChangeNotifier {
     required String school,
     required String grade,
     required int oLevelYear,
+    String? phone,
+    String? photoUrl,
   }) async {
     if (_currentStudent == null) return false;
 
@@ -117,6 +119,8 @@ class AuthProvider extends ChangeNotifier {
         school: school.trim(),
         grade: grade.trim(),
         oLevelYear: oLevelYear,
+        phone: phone != null ? phone.trim() : _currentStudent!.phone,
+        photoUrl: photoUrl != null ? photoUrl.trim() : _currentStudent!.photoUrl,
       );
 
       await _firebaseService.updateStudentProfile(updatedStudent);
