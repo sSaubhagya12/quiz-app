@@ -26,12 +26,14 @@ class AuthProvider extends ChangeNotifier {
     try {
       StudentModel? student;
 
-      // Fields හිස් නම් demo account ලෙස login කිරීම
-      if (email.trim().isEmpty && password.isEmpty) {
-        student = await _firebaseService.loginWithDemoAccount();
-      } else {
-        student = await _firebaseService.loginStudent(email, password);
+      // Email සහ Password හිස්දැයි පරීක්ෂා කිරීම
+      if (email.trim().isEmpty || password.isEmpty) {
+        _setError("කරුණාකර ඊමේල් ලිපිනය සහ මුරපදය ඇතුළත් කරන්න!");
+        _setLoading(false);
+        return false;
       }
+
+      student = await _firebaseService.loginStudent(email, password);
 
       if (student != null) {
         _currentStudent = student;
