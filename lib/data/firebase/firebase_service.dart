@@ -19,6 +19,9 @@ class FirebaseService {
   bool _isOfflineMode = false;
   bool get isOfflineMode => _isOfflineMode;
 
+  // Seeding lock to prevent concurrent duplicate seeds
+  bool _seedingInProgress = false;
+
   // In-memory data for offline mode
   StudentModel? _offlineStudent;
   final List<SubjectModel> _offlineSubjects = [
@@ -460,23 +463,23 @@ class FirebaseService {
 
     try {
       final snap = await _db.collection('subjects').get();
-      if (snap.docs.isEmpty) {
-        await _seedSubjectsAndQuestions();
-        final newSnap = await _db.collection('subjects').get();
-        final all = newSnap.docs.map((d) => SubjectModel.fromMap(d.data(), id: d.id)).toList();
-        if (searchQuery != null && searchQuery.isNotEmpty) {
-          return all.where((s) => s.name.toLowerCase().contains(searchQuery.toLowerCase())).toList();
+
+      // Seed missing subjects using fixed IDs (idempotent upsert — never creates duplicates)
+      if ((snap.docs.isEmpty || snap.docs.length < 15) && !_seedingInProgress) {
+        _seedingInProgress = true;
+        try {
+          await _seedSubjectsAndQuestions();
+        } finally {
+          _seedingInProgress = false;
         }
-        return all;
       }
 
-      var all = snap.docs.map((d) => SubjectModel.fromMap(d.data(), id: d.id)).toList();
-      // Firestore හි ඇති විෂයන් ප්‍රමාණය 15 ට වඩා අඩු නම්, ඉතිරි ඒවා seed කිරීම
-      if (all.length < 15) {
-        await _seedMissingSubjects(all);
-        final newSnap = await _db.collection('subjects').get();
-        all = newSnap.docs.map((d) => SubjectModel.fromMap(d.data(), id: d.id)).toList();
-      }
+      final newSnap = await _db.collection('subjects').get();
+      var all = newSnap.docs.map((d) => SubjectModel.fromMap(d.data(), id: d.id)).toList();
+
+      // Deduplicate by name (safety net for any pre-existing duplicates in Firestore)
+      final seen = <String>{};
+      all = all.where((s) => seen.add(s.name.toLowerCase())).toList();
 
       if (searchQuery != null && searchQuery.isNotEmpty) {
         return all.where((s) => s.name.toLowerCase().contains(searchQuery.toLowerCase())).toList();
@@ -488,37 +491,25 @@ class FirebaseService {
     }
   }
 
-  // Firestore හි නොමැති විෂයන් seed කිරීමට සහායක ක්‍රමවේදයක්
-  Future<void> _seedMissingSubjects(List<SubjectModel> existing) async {
-    final batch = _db.batch();
-    final existingNames = existing.map((s) => s.name.toLowerCase()).toSet();
+  // Fixed subject IDs and seed data — using fixed doc IDs ensures set() is idempotent (no duplicates ever)
+  static const List<Map<String, dynamic>> _subjectSeedData = [
+    {'id': 'religion',    'name': 'Religion',                    'iconName': 'volunteer_activism', 'imageUrl': 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&q=80',    'totalQuestions': 0,  'completedRate': 0.0},
+    {'id': 'sinhala',     'name': 'Sinhala',                     'iconName': 'book',               'imageUrl': 'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=400&q=80',    'totalQuestions': 0,  'completedRate': 0.0},
+    {'id': 'english',     'name': 'English',                     'iconName': 'language',           'imageUrl': 'https://images.unsplash.com/photo-1451226428352-cf66b8a0317a?w=400&q=80',    'totalQuestions': 0,  'completedRate': 0.0},
+    {'id': 'math',        'name': 'Mathematics',                 'iconName': 'calculate',          'imageUrl': 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=400&q=80',    'totalQuestions': 3,  'completedRate': 0.0},
+    {'id': 'sci',         'name': 'Science',                     'iconName': 'science',            'imageUrl': 'https://images.unsplash.com/photo-1507668077129-56e32842fceb?w=400&q=80',    'totalQuestions': 30, 'completedRate': 0.0},
+    {'id': 'history',     'name': 'History',                     'iconName': 'history',            'imageUrl': 'https://images.unsplash.com/photo-1461360370896-922624d12aa1?w=400&q=80',    'totalQuestions': 0,  'completedRate': 0.0},
+    {'id': 'business',    'name': 'Business & Accounting Studies','iconName': 'analytics',          'imageUrl': 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80',    'totalQuestions': 0,  'completedRate': 0.0},
+    {'id': 'geo',         'name': 'Geography',                   'iconName': 'public',             'imageUrl': 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=400&q=80',       'totalQuestions': 0,  'completedRate': 0.0},
+    {'id': 'civic',       'name': 'Civic Education',             'iconName': 'gavel',              'imageUrl': 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&q=80',    'totalQuestions': 0,  'completedRate': 0.0},
+    {'id': 'music',       'name': 'Music',                       'iconName': 'music_note',         'imageUrl': 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&q=80',    'totalQuestions': 0,  'completedRate': 0.0},
+    {'id': 'dancing',     'name': 'Dancing',                     'iconName': 'emoji_people',       'imageUrl': 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=400&q=80',    'totalQuestions': 0,  'completedRate': 0.0},
+    {'id': 'art',         'name': 'Art (Act)',                   'iconName': 'palette',            'imageUrl': 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&q=80',    'totalQuestions': 0,  'completedRate': 0.0},
+    {'id': 'ict',         'name': 'Information & Communication', 'iconName': 'computer',           'imageUrl': 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&q=80',    'totalQuestions': 0,  'completedRate': 0.0},
+    {'id': 'agriculture', 'name': 'Agriculture & Food Technology','iconName': 'agriculture',        'imageUrl': 'https://images.unsplash.com/photo-1464226184884-fa280b87c3a9?w=400&q=80',    'totalQuestions': 0,  'completedRate': 0.0},
+    {'id': 'health',      'name': 'Health & Physical Education', 'iconName': 'fitness_center',     'imageUrl': 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400&q=80',    'totalQuestions': 0,  'completedRate': 0.0},
+  ];
 
-    final subjectsToSeed = [
-      {'name': 'Religion', 'iconName': 'volunteer_activism', 'imageUrl': 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Sinhala', 'iconName': 'book', 'imageUrl': 'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'English', 'iconName': 'language', 'imageUrl': 'https://images.unsplash.com/photo-1451226428352-cf66b8a0317a?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Mathematics', 'iconName': 'calculate', 'imageUrl': 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=400&q=80', 'totalQuestions': 3, 'completedRate': 0.0},
-      {'name': 'Science', 'iconName': 'science', 'imageUrl': 'https://images.unsplash.com/photo-1507668077129-56e32842fceb?w=400&q=80', 'totalQuestions': 30, 'completedRate': 0.0},
-      {'name': 'History', 'iconName': 'history', 'imageUrl': 'https://images.unsplash.com/photo-1461360370896-922624d12aa1?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Business & Accounting Studies', 'iconName': 'analytics', 'imageUrl': 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Geography', 'iconName': 'public', 'imageUrl': 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Civic Education', 'iconName': 'gavel', 'imageUrl': 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Music', 'iconName': 'music_note', 'imageUrl': 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Dancing', 'iconName': 'emoji_people', 'imageUrl': 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Art (Act)', 'iconName': 'palette', 'imageUrl': 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Information & Communication', 'iconName': 'computer', 'imageUrl': 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Agriculture & Food Technology', 'iconName': 'agriculture', 'imageUrl': 'https://images.unsplash.com/photo-1464226184884-fa280b87c3a9?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Health & Physical Education', 'iconName': 'fitness_center', 'imageUrl': 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-    ];
-
-    for (var sub in subjectsToSeed) {
-      if (!existingNames.contains((sub['name'] as String).toLowerCase())) {
-        final ref = _db.collection('subjects').doc();
-        batch.set(ref, sub);
-      }
-    }
-    await batch.commit();
-  }
 
   Future<void> updateSubjectProgress(String subjectId, double completedRate) async {
     if (_isOfflineMode) {
@@ -787,34 +778,18 @@ class FirebaseService {
   Future<void> _seedSubjectsAndQuestions() async {
     final batch = _db.batch();
 
-    final subjects = [
-      {'name': 'Religion', 'iconName': 'volunteer_activism', 'imageUrl': 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Sinhala', 'iconName': 'book', 'imageUrl': 'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'English', 'iconName': 'language', 'imageUrl': 'https://images.unsplash.com/photo-1451226428352-cf66b8a0317a?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Mathematics', 'iconName': 'calculate', 'imageUrl': 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=400&q=80', 'totalQuestions': 3, 'completedRate': 0.0},
-      {'name': 'Science', 'iconName': 'science', 'imageUrl': 'https://images.unsplash.com/photo-1507668077129-56e32842fceb?w=400&q=80', 'totalQuestions': 30, 'completedRate': 0.0},
-      {'name': 'History', 'iconName': 'history', 'imageUrl': 'https://images.unsplash.com/photo-1461360370896-922624d12aa1?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Business & Accounting Studies', 'iconName': 'analytics', 'imageUrl': 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Geography', 'iconName': 'public', 'imageUrl': 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Civic Education', 'iconName': 'gavel', 'imageUrl': 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Music', 'iconName': 'music_note', 'imageUrl': 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Dancing', 'iconName': 'emoji_people', 'imageUrl': 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Art (Act)', 'iconName': 'palette', 'imageUrl': 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Information & Communication', 'iconName': 'computer', 'imageUrl': 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Agriculture & Food Technology', 'iconName': 'agriculture', 'imageUrl': 'https://images.unsplash.com/photo-1464226184884-fa280b87c3a9?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-      {'name': 'Health & Physical Education', 'iconName': 'fitness_center', 'imageUrl': 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=400&q=80', 'totalQuestions': 0, 'completedRate': 0.0},
-    ];
-
-    final Map<String, String> subjectIds = {};
-    for (var sub in subjects) {
-      final ref = _db.collection('subjects').doc();
-      batch.set(ref, sub);
-      subjectIds[sub['name'] as String] = ref.id;
+    // Use fixed document IDs — batch.set() with a fixed ID is an idempotent upsert,
+    // so calling this multiple times never creates duplicate subject documents.
+    for (var sub in _subjectSeedData) {
+      final id = sub['id'] as String;
+      final data = Map<String, dynamic>.from(sub)..remove('id');
+      final ref = _db.collection('subjects').doc(id);
+      batch.set(ref, data, SetOptions(merge: true));
     }
-
     await batch.commit();
 
-    final String scienceId = subjectIds['Science']!;
+    // Fixed subject IDs for questions
+    const String scienceId = 'sci';
     final scienceQuestions = [
       {'subjectId': scienceId, 'questionText': 'බහිස්ස්‍රාවී ද්‍රව්‍යයක් වන යුරියා නිපදවෙන්නේ?', 'option1': 'වකුගඩුවල', 'option2': 'අක්මාවෙහි', 'option3': 'මුත්‍රාශයෙහි', 'option4': 'වෘක්කාණුවල', 'correctOption': 2, 'explanation': 'යුරියා නිපදවෙන්නේ අක්මාවෙහිය.'},
       {'subjectId': scienceId, 'questionText': 'ක්ෂමතාවේ (Power) ඒකකය කුමක්ද?', 'option1': 'Ws', 'option2': 'Ws⁻¹', 'option3': 'Js', 'option4': 'Js⁻¹', 'correctOption': 4, 'explanation': 'ක්ෂමතාව = ශක්තිය/කාලය = Js⁻¹ (Watt).'},
@@ -854,7 +829,7 @@ class FirebaseService {
       batch2.set(ref, q);
     }
 
-    final String mathId = subjectIds['Mathematics']!;
+    const String mathId = 'math';
     final mathQuestions = [
       {
         'subjectId': mathId,

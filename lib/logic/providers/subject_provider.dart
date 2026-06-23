@@ -9,17 +9,25 @@ class SubjectProvider extends ChangeNotifier {
   List<SubjectModel> _allSubjects = [];
   List<SubjectModel> _filteredSubjects = [];
   bool _isLoading = false;
+  bool _isLoaded = false; // guard: prevents duplicate Firestore calls
   String? _errorMessage;
 
   // Getters
-  List<SubjectModel> get subjects => _filteredSubjects;
+  List<SubjectModel> get subjects {
+    // Deduplicate by name as a safety net for any pre-existing Firestore duplicates
+    final seen = <String>{};
+    return _filteredSubjects.where((s) => seen.add(s.name.toLowerCase())).toList();
+  }
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
   // ==========================================
   // 1. LOAD SUBJECTS (Firestore)
   // ==========================================
-  Future<void> loadSubjects() async {
+  Future<void> loadSubjects({bool forceRefresh = false}) async {
+    // Skip if already loaded (prevents duplicate calls from Home + Subjects pages)
+    if (_isLoaded && !forceRefresh) return;
+
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -27,6 +35,7 @@ class SubjectProvider extends ChangeNotifier {
     try {
       _allSubjects = await _firebaseService.getSubjects();
       _filteredSubjects = List.from(_allSubjects);
+      _isLoaded = true;
       _isLoading = false;
       notifyListeners();
     } catch (e) {
