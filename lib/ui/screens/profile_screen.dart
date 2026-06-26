@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../../logic/providers/auth_provider.dart';
 import '../../logic/providers/theme_provider.dart';
 import '../../data/models/student_model.dart';
+import '../../logic/providers/quiz_provider.dart';
+import '../../main.dart';
 import 'results_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -749,11 +751,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   width: 200,
                   height: 48,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const ResultsScreen()),
-                      );
+                    onPressed: () async {
+                      if (student?.uid != null) {
+                        await context.read<QuizProvider>().loadHighestScores(student!.uid!);
+                      }
+                      if (context.mounted) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const ResultsScreen()),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1E3C72),
@@ -780,7 +787,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     onPressed: () async {
                       await authProvider.logout();
                       if (context.mounted) {
-                        Navigator.of(context).popUntil((route) => route.isFirst);
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (_) => const WelcomeOrLoginPage()),
+                          (route) => false,
+                        );
                       }
                     },
                     icon: const Icon(Icons.logout_rounded, color: Colors.redAccent),

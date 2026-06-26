@@ -21,11 +21,18 @@ class QuizProvider extends ChangeNotifier {
 
   Timer? _timer;
   int _secondsElapsed = 0;
+  final int _totalTimeLimit = 45 * 60; // 45 minutes in seconds
+  String? _currentStudentId;
 
   bool _isQuizCompleted = false;
   QuizResultModel? _lastQuizResult;
   List<StudentAnswerModel> _reviewAnswers = [];
   bool _showReviewPanel = false;
+
+  bool _isTimeOut = false;
+  bool _timeOutNotified = false;
+
+  Map<String, QuizResultModel> _highestScores = {};
 
   // Getters
   SubjectModel? get currentSubject => _currentSubject;
@@ -39,6 +46,14 @@ class QuizProvider extends ChangeNotifier {
   QuizResultModel? get lastQuizResult => _lastQuizResult;
   List<StudentAnswerModel> get reviewAnswers => _reviewAnswers;
   bool get showReviewPanel => _showReviewPanel;
+  bool get isTimeOut => _isTimeOut;
+  bool get timeOutNotified => _timeOutNotified;
+  Map<String, QuizResultModel> get highestScores => _highestScores;
+
+  void markTimeOutNotified() {
+    _timeOutNotified = true;
+    notifyListeners();
+  }
 
   QuestionModel? get currentQuestion {
     if (_questions.isEmpty || _currentQuestionIndex >= _questions.length) return null;
@@ -46,17 +61,37 @@ class QuizProvider extends ChangeNotifier {
   }
 
   String get formattedTime {
-    final minutes = (_secondsElapsed ~/ 60).toString().padLeft(2, '0');
-    final seconds = (_secondsElapsed % 60).toString().padLeft(2, '0');
+    final remaining = _totalTimeLimit - _secondsElapsed;
+    if (remaining < 0) return "00:00";
+    final minutes = (remaining ~/ 60).toString().padLeft(2, '0');
+    final seconds = (remaining % 60).toString().padLeft(2, '0');
     return "$minutes:$seconds";
   }
 
   // ==========================================
   // 1. START QUIZ (Firestore)
   // ==========================================
-  Future<void> startQuiz(SubjectModel subject) async {
+  Future<void> startQuiz(SubjectModel subject, String studentId) async {
+    // Resume logic: if returning to the same subject
+    if (_currentSubject?.id == subject.id) {
+      if (!_isQuizCompleted && _questions.isNotEmpty) {
+        // Resume in-progress quiz
+        _currentStudentId = studentId;
+        _isLoading = false;
+        notifyListeners();
+        return;
+      } else if (_isQuizCompleted && _isTimeOut && !_timeOutNotified) {
+        // Time ran out while away, and they haven't seen the dialog
+        _currentStudentId = studentId;
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+    }
+
     _isLoading = true;
     _currentSubject = subject;
+    _currentStudentId = studentId;
     _questions = [];
     _currentQuestionIndex = 0;
     _selectedOption = -1;
@@ -65,7 +100,10 @@ class QuizProvider extends ChangeNotifier {
     _isQuizCompleted = false;
     _lastQuizResult = null;
     _reviewAnswers = [];
+    _highestScores = {};
     _showReviewPanel = false;
+    _isTimeOut = false;
+    _timeOutNotified = false;
     _errorMessage = null;
     notifyListeners();
 
@@ -116,7 +154,7 @@ class QuizProvider extends ChangeNotifier {
 
     _errorMessage = null;
 
-    // Answer save (use question String ID as key)
+    // Save the current answer
     _studentAnswersMap[currentQuestion!.id!] = _selectedOption;
 
     if (_currentQuestionIndex < _questions.length - 1) {
@@ -127,6 +165,37 @@ class QuizProvider extends ChangeNotifier {
       _stopTimer();
       await _submitAndSaveQuiz(studentId);
     }
+  }
+
+  // Go back to previous question (restores saved answer)
+  void previousQuestion() {
+    if (_currentQuestionIndex <= 0) return;
+    // Save any in-progress selection
+    if (currentQuestion != null && _selectedOption != -1) {
+      _studentAnswersMap[currentQuestion!.id!] = _selectedOption;
+    }
+    _currentQuestionIndex--;
+    _selectedOption = _studentAnswersMap[currentQuestion!.id!] ?? -1;
+    _errorMessage = null;
+    notifyListeners();
+  }
+
+  // Jump to any question index (preview panel)
+  void jumpToQuestion(int index) {
+    if (index < 0 || index >= _questions.length) return;
+    // Save any in-progress selection
+    if (currentQuestion != null && _selectedOption != -1) {
+      _studentAnswersMap[currentQuestion!.id!] = _selectedOption;
+    }
+    _currentQuestionIndex = index;
+    _selectedOption = _studentAnswersMap[currentQuestion!.id!] ?? -1;
+    _errorMessage = null;
+    notifyListeners();
+  }
+
+  // Get saved answer for a question (returns -1 if unanswered)
+  int getAnswerForQuestion(String questionId) {
+    return _studentAnswersMap[questionId] ?? -1;
   }
 
   // ==========================================
@@ -179,9 +248,13 @@ class QuizProvider extends ChangeNotifier {
       );
 
       _isQuizCompleted = true;
+      _showReviewPanel = true;
 
       // Review answers Firestore වෙතින් ලබාගැනීම
       _reviewAnswers = await _firebaseService.getAnswersForQuizResult(studentId, resultId);
+      
+      // Fetch highest scores for the Results Screen
+      await loadHighestScores(studentId);
 
       _isLoading = false;
       notifyListeners();
@@ -189,6 +262,16 @@ class QuizProvider extends ChangeNotifier {
       _errorMessage = "ප්‍රතිඵල සුරක්ෂිත කිරීමේදී දෝෂයක්: ${e.toString()}";
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  // අතීත ප්‍රතිඵල (Highest Scores) පූරණය කිරීම (Profile Screen එකෙන්)
+  Future<void> loadHighestScores(String studentId) async {
+    try {
+      _highestScores = await _firebaseService.getHighestScoresBySubject(studentId);
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Highest scores load failed: $e");
     }
   }
 
@@ -206,8 +289,16 @@ class QuizProvider extends ChangeNotifier {
   void _startTimer() {
     _secondsElapsed = 0;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      _secondsElapsed++;
-      notifyListeners();
+      if (_secondsElapsed < _totalTimeLimit) {
+        _secondsElapsed++;
+        notifyListeners();
+      } else {
+        _stopTimer();
+        if (_currentStudentId != null && !_isQuizCompleted) {
+          _isTimeOut = true;
+          _submitAndSaveQuiz(_currentStudentId!);
+        }
+      }
     });
   }
 

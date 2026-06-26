@@ -40,7 +40,7 @@ class FirebaseService {
       iconName: 'book',
       imageUrl:
           'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=400&q=80',
-      totalQuestions: 0,
+      totalQuestions: 30,
       completedRate: 0.0,
     ),
     SubjectModel(
@@ -494,6 +494,324 @@ class FirebaseService {
           option4: '" සූකරානි අසාධුනී - අත්තනෝ අහිතානි ච" යන්නයි.',
           correctOption: 3,
           explanation: 'නිවැරදි පිළිතුර 3 වේ.'),
+    ],
+    'sinhala': [
+      QuestionModel(
+          id: 'sin_q1',
+          subjectId: 'sinhala',
+          questionText:
+              'ඔහුගෙන් වචනයක් ගැනීම වනාහි ගලෙන් පට්ටයක් ගැනීම වැනි කාර්යයකි.',
+          option1: 'අමාරුවෙන් කළ යුත්තකි.',
+          option2: 'ඉතා පහසු කටයුත්තකි.',
+          option3: 'ශරීර ශක්තිය යොදා කළ යුත්තකි.',
+          option4: 'කිසිදා සිදු කළ නොහැක්කකි.',
+          correctOption: 4,
+          explanation: 'නිවැරදි පිළිතුර: (4)'),
+      QuestionModel(
+          id: 'sin_q2',
+          subjectId: 'sinhala',
+          questionText: 'මා දුන් අඹගෙඩිය, දුගියා තලු මරමින් කෑවේ ය.',
+          option1: 'ඉතා ම ආශාවෙන්',
+          option2: 'කටින් හඬක් පිට කරමින්',
+          option3: 'තල්ලෙහි ගෑවෙන පරිද්දෙන්',
+          option4: 'ඉතා අකමැත්තෙන්',
+          correctOption: 1,
+          explanation: 'නිවැරදි පිළිතුර: (1)'),
+      QuestionModel(
+          id: 'sin_q3',
+          subjectId: 'sinhala',
+          questionText:
+              'සිරිපාල දිය යටින් ගින්දර ගෙනියන පුද්ගලයකු සේ ප්‍රසිද්ධ ය.',
+          option1: 'උපක්‍රමශීලී ව වැඩ නොකරන',
+          option2: 'අන්‍යයා තළා - පෙළා වැඩ කරන',
+          option3: 'කට්ට, කෛරාටික, වංචනික ක්‍රියා කරන',
+          option4: 'අන් අයට කළ නොහැකි දේ කරන',
+          correctOption: 3,
+          explanation: 'නිවැරදි පිළිතුර: (3)'),
+      QuestionModel(
+          id: 'sin_q4',
+          subjectId: 'sinhala',
+          questionText:
+              'යමක් ඇති සැටියෙන් වර්ණනා කිරීම ........................ වේ.',
+          option1: 'ස්වභාවාලංකාරය',
+          option2: 'ස්වභාවෝක්ත්‍යාලංකාරය',
+          option3: 'ස්වභාව සිද්ධාලංකාරය',
+          option4: 'ස්වභාව ධර්මාලංකාරය',
+          correctOption: 2,
+          explanation: 'නිවැරදි පිළිතුර: (2)'),
+      QuestionModel(
+          id: 'sin_q5',
+          subjectId: 'sinhala',
+          questionText:
+              'තමාගෙන් වූ වරද ඔවුහු ........................ ලක් කළහ.',
+          option1: 'සාධාරණීකරණයට',
+          option2: 'අසාධාරණීකරණයට',
+          option3: 'වර්ගීකරණයට',
+          option4: 'ප්‍රමිතිකරණයට',
+          correctOption: 1,
+          explanation: 'නිවැරදි පිළිතුර: (1)'),
+      QuestionModel(
+          id: 'sin_q6',
+          subjectId: 'sinhala',
+          questionText:
+              'ඇතැමුන් ජනප්‍රසාදය අහිමි කර ගත්තේ තම ........................ නිසාය.',
+          option1: 'අවංකකම',
+          option2: 'අනතිමානීකම',
+          option3: 'ගුණවත්කම',
+          option4: 'උද්ධච්චකම',
+          correctOption: 4,
+          explanation: 'නිවැරදි පිළිතුර: (4)'),
+      QuestionModel(
+          id: 'sin_q7',
+          subjectId: 'sinhala',
+          questionText: 'ආකාරාදි පිළිවෙළ නිවැරදිව දැක්වෙන පද පේළිය තෝරන්න.',
+          option1: 'තිසරය, කෝකිලය, නීලකොබෝව, සැවුලුව',
+          option2: 'ගිරාව, මයුරය, සැළලිහිණිය, හංසය',
+          option3: 'රත්නාවලිය, පූජාවලිය, බුත්සරණ, ධර්ම ප්‍රදීපිකාව',
+          option4: 'සසදාවත, මුවදෙව්දාවත, කව්සිළුමිණ, කාව්‍යශේඛරය',
+          correctOption: 2,
+          explanation: 'නිවැරදි පිළිතුර: (2) - ග, ම, ස, හ අනුපිළිවෙළ'),
+      QuestionModel(
+          id: 'sin_q8',
+          subjectId: 'sinhala',
+          questionText:
+              'සැම පදයකම අක්ෂර වින්‍යාසය නිවැරදි ව යෙදී ඇති පද පේළිය තෝරන්න.',
+          option1: 'සම්මුඛ, සුකුමාළ, සිතුමිණ, චුම්භක',
+          option2: 'ගුරුමුෂ්ඨි, ගොලුවා, චන්ද්‍ර ග්‍රහණ, තොටුපොල',
+          option3: 'පරිඥාණ, පරිපූර්ණ, යුද්ධායුද, ශික්ෂණ',
+          option4: 'ආරූඪ, මිනුම, ශීතෝෂ්ණ, සහස්‍ර',
+          correctOption: 4,
+          explanation: 'නිවැරදි පිළිතුර: (4)'),
+      QuestionModel(
+          id: 'sin_q9',
+          subjectId: 'sinhala',
+          questionText:
+              'දීර්ඝ පාපිල්ල, කොම්බුව හා දීර්ඝත්ව ලක්ෂණය, දීර්ඝ ඇදය සහ කෙටි ඉස්පිල්ල අනුපිළිවෙළින් යෙදී ඇති වරණය තෝරන්න.',
+          option1: 'සූරයා, කේතලය, නෑකම, විපත',
+          option2: 'නෑකම, කේතලය, සූරයා, විපත',
+          option3: 'සූරයා, විපත, නෑකම, කේතලය',
+          option4: 'නෑකම, විපත, කේතලය, සූරයා',
+          correctOption: 1,
+          explanation: 'නිවැරදි පිළිතුර: (1)'),
+      QuestionModel(
+          id: 'sin_q10',
+          subjectId: 'sinhala',
+          questionText: 'ඕෂ්ඨජ ව්‍යංජන පමණක් අන්තර්ගත වචනය තෝරන්න.',
+          option1: 'භය',
+          option2: 'මල',
+          option3: 'පඹ',
+          option4: 'පස',
+          correctOption: 3,
+          explanation: 'නිවැරදි පිළිතුර: (3)'),
+      QuestionModel(
+          id: 'sin_q11',
+          subjectId: 'sinhala',
+          questionText: '"ඇළ දොළ" යන්න අයත් වන්නේ,',
+          option1: 'අන්‍යාර්ථ සමාසයට ය.',
+          option2: 'විභක්ති සමාසයට ය.',
+          option3: 'දකාරාර්ථ සමාසයට ය.',
+          option4: 'අව්‍යය සමාසයට ය.',
+          correctOption: 3,
+          explanation: 'නිවැරදි පිළිතුර: (3) - ද්වන්ද සමාසය'),
+      QuestionModel(
+          id: 'sin_q12',
+          subjectId: 'sinhala',
+          questionText: 'අනුක්ත නාම පද පමණක් යෙදී ඇති වරණය තෝරන්න.',
+          option1: 'සාවකු, ගෙම්බෙක්, වනචාරියකු, දෙවඟනක',
+          option2: 'වහලකු, දුනුවායන්, අප, සහෘදයෝ',
+          option3: 'කපුටෙකු, යෞවනියක්, ක්‍රීඩිකාවක, මා',
+          option4: 'සොල්දාදුවකු, මාළුවකු, ව්‍යාපාරිකයන්, තොප',
+          correctOption: 1,
+          explanation: 'නිවැරදි පිළිතුර: (1)'),
+      QuestionModel(
+          id: 'sin_q13',
+          subjectId: 'sinhala',
+          questionText:
+              '"සේවකයෝ රාජකාරි නිමා කර කාර්යාලයෙන් පිටත් වූහ." - "කාර්යාලයෙන්" යන්නෙහි විභක්තිය?',
+          option1: 'අවධි විභක්තිය',
+          option2: 'ආධාර විභක්තිය',
+          option3: 'සම්ප්‍රදාන විභක්තිය',
+          option4: 'කර්ම විභක්තිය',
+          correctOption: 1,
+          explanation: 'නිවැරදි පිළිතුර: (1)'),
+      QuestionModel(
+          id: 'sin_q14',
+          subjectId: 'sinhala',
+          questionText:
+              'නීති + ඉක යන ප්‍රකෘතිය හා ප්‍රත්‍යයය එක් වූ විට සෑදෙන නිවැරදි වචනය?',
+          option1: 'නෛතික',
+          option2: 'නීතියික',
+          option3: 'නෛතීක',
+          option4: 'නීතික',
+          correctOption: 1,
+          explanation: 'නිවැරදි පිළිතුර: (1)'),
+      QuestionModel(
+          id: 'sin_q15',
+          subjectId: 'sinhala',
+          questionText: 'ව්‍යාකරණ ප්‍රවර්ගයට අයත් නොවන පදයක් සහිත වරණය: කෘදන්ත',
+          option1: 'පූර්ව ක්‍රියා - කා, නා, පා, දා',
+          option2: 'කෘදන්ත - සරන, කරන, දරන, පරණ',
+          option3: 'ස්වර සන්ධි - මලසුන, මතැත්, එදිනෙදා, සිතැති',
+          option4: 'උපසර්ග - විරූප, විදේශ, විසන්ධි, විරාග',
+          correctOption: 2,
+          explanation: 'නිවැරදි පිළිතුර: (2) - "පරණ" කෘදන්ත නොවේ'),
+      QuestionModel(
+          id: 'sin_q16',
+          subjectId: 'sinhala',
+          questionText: 'මිශ්‍ර ක්‍රියාවක් යෙදී ඇති වාක්‍යය කුමක්ද?',
+          option1: 'තම නමින් මිය ගිය ඥාතීන් සිහි කොට පින් දෙන්න.',
+          option2: 'ඔවුහු මිතුදමින් වෙළී සිටියහ.',
+          option3: 'ඔහු ගුණවත්කමින් පිරිපුන් මිනිසෙක් වූයේය.',
+          option4: 'නිමාශා තම දක්ෂතා විදහා පාමින් ගීයක් ගැයුවාය.',
+          correctOption: 4,
+          explanation: 'නිවැරදි පිළිතුර: (4)'),
+      QuestionModel(
+          id: 'sin_q17',
+          subjectId: 'sinhala',
+          questionText:
+              '"නිරාගමික" යන්නෙහි අර්ථය: "කලින් කල ලෝකයෙහි නිරාගමික සංකල්ප පහළ වෙයි."',
+          option1: 'ආගමකට අයත් වූ',
+          option2: 'ආගමානුකූල හැඟීමෙන් යුතු',
+          option3: 'ආගමකට අයත් නැති',
+          option4: 'වැරදි ආගමික අදහස් සහිත',
+          correctOption: 3,
+          explanation: 'නිවැරදි පිළිතුර: (3)'),
+      QuestionModel(
+          id: 'sin_q18',
+          subjectId: 'sinhala',
+          questionText:
+              '"රණ ශූරයෙකි" යන්නෙහි අර්ථය: "සීතාවක රාජසිංහ රජතුමා රණ ශූරයෙකි."',
+          option1: 'යුද්ධයෙහි දක්ෂ නොවූවෙකි.',
+          option2: 'යුද්ධ ජයග්‍රහණයේ දක්ෂයෙකි.',
+          option3: 'යුද්ධකාමියෙකි.',
+          option4: 'යුද්ධයෙහි දක්ෂයෙකි.',
+          correctOption: 4,
+          explanation: 'නිවැරදි පිළිතුර: (4)'),
+      QuestionModel(
+          id: 'sin_q19',
+          subjectId: 'sinhala',
+          questionText:
+              '"අතීතාවර්ජනයක" යන්නෙහි අර්ථය: "ශිෂ්‍යාව අතීතාවර්ජනයක නිරත වූවා ය."',
+          option1: 'අතීතය අමතක කිරීමක',
+          option2: 'අතීතයට ගමන් කිරීමක',
+          option3: 'අතීතය ගැන මතක් කිරීමක',
+          option4: 'අතීතයේ ජීවත් වීමක',
+          correctOption: 3,
+          explanation: 'නිවැරදි පිළිතුර: (3)'),
+      QuestionModel(
+          id: 'sin_q20',
+          subjectId: 'sinhala',
+          questionText:
+              'අන්‍යෝන්‍ය වශයෙන් සමීප කාර්‍යයන් සමග බැඳී නොපවත්නා පද පේළිය තෝරන්න.',
+          option1: 'අල්මාරිය, පෙට්ටිය, ලාච්චුව, පුටුව',
+          option2: 'ඉටිපන්දම්, හඳුන්කූරු, පහන්, කපුරු',
+          option3: 'පොල්, ලුණු, දුරු, මිරිස්',
+          option4: 'කොට්ටය, ඇඳ මෙට්ටය, ඇතිරිල්ල',
+          correctOption: 1,
+          explanation: 'නිවැරදි පිළිතුර: (1)'),
+      QuestionModel(
+          id: 'sin_q21',
+          subjectId: 'sinhala',
+          questionText: 'සමානාර්ථ යෙදුම් පමණක් ඇතුළත් පද පේළිය තෝරන්න.',
+          option1: 'දේව - සුර, භෝජන - ආහාර, මුහුද - ජලාශය, වාහනය - රථය',
+          option2: 'මිනිසා - මනුෂ්‍යයා, සවන - කන, නේත්‍ර - නයන, නගරය - නුවර',
+          option3: 'වාලුකා - වැලි, ගෘහය - ගෙය, භාග්‍යය - දුක, තරුණ - යොවුන්',
+          option4:
+              'ප්‍රාසාදය - පහය, සත්‍යය - ඇත්ත, දිනය - වර්ෂය, කුඹුර - ක්ෂේත්‍රය',
+          correctOption: 2,
+          explanation: 'නිවැරදි පිළිතුර: (2)'),
+      QuestionModel(
+          id: 'sin_q22',
+          subjectId: 'sinhala',
+          questionText: '"කාලය" යන පදයට සමානාර්ථයක් නොදෙන පදයක් ඇතුළත් වරණය?',
+          option1: 'කාලය - වේලාව, තල, නිමේෂය, දහවල',
+          option2: 'ශරීරය - දේහය, සිරුර, කය, ඇඟ',
+          option3: 'කුරුල්ලා - ශකුන, පක්ෂියා, විහඟ, දද',
+          option4: 'හස්ති - ගජ, වරණ, ඇතා, ගිජිඳු',
+          correctOption: 1,
+          explanation: 'නිවැරදි පිළිතුර: (1)'),
+      QuestionModel(
+          id: 'sin_q23',
+          subjectId: 'sinhala',
+          questionText: 'විරුද්ධාර්ථවත් පද යුගලයක් ඇතුළත් නොවන වරණය?',
+          option1: 'විමල - නිමල',
+          option2: 'ආදර - අනාදර',
+          option3: 'ඵල - අඵල',
+          option4: 'හුරු - නුහුරු',
+          correctOption: 1,
+          explanation: 'නිවැරදි පිළිතුර: (1)'),
+      QuestionModel(
+          id: 'sin_q24',
+          subjectId: 'sinhala',
+          questionText: 'වැරදි අදහස දෙන ප්‍රකාශය කුමක්ද?',
+          option1: '"නුඹ" යනු මධ්‍යම පුරුෂ බහු වචනයකි.',
+          option2: 'ඍ යන්න මූර්ධජ අක්ෂරයකි.',
+          option3: '"බලමි" යන්න වර්තමාන කාල, උත්තම පුරුෂ, ඒක වචනයකි.',
+          option4: '"බලවත්" යන්න තද්ධිත පදයකි.',
+          correctOption: 1,
+          explanation: 'නිවැරදි පිළිතුර: (1)'),
+      QuestionModel(
+          id: 'sin_q25',
+          subjectId: 'sinhala',
+          questionText: 'මනා පද ගැළපීමෙන් යුක්ත අර්ථාන්විත වාක්‍යය?',
+          option1: 'සාහිත්‍ය නිර්මාණයක් පදනම් වී වස්තු බීජයක් ඇති කෙරේ.',
+          option2: 'යුද්ධයක් නිසා දේශපාලන ලෝකයේ ස්ථාවරත්වයට හේතු වේ.',
+          option3: 'සතුරන්ගේ ආක්‍රමණ වලට අප උපක්‍රමශීලී විය යුතු ය.',
+          option4: 'තොරතුරු යාවත්කාලීන කිරීම රටක ප්‍රගමනයට උපකාරී වෙයි.',
+          correctOption: 4,
+          explanation: 'නිවැරදි පිළිතුර: (4)'),
+      QuestionModel(
+          id: 'sin_q26',
+          subjectId: 'sinhala',
+          questionText:
+              'තිබෙන දෙයටත් වඩා අයහපත් දෙයක් ළං කර ගැනීම - ගැළපෙන පිරුළ?',
+          option1: 'කන්න දුන්න අත හපා කෑව වගේ.',
+          option2: 'ඉස්සෙල්ලා ආපු කනට වඩා පස්සෙ ආපු අඟ ලොකු වුණා වගේ.',
+          option3: 'ඉඟුරු දී මිරිස් ගත්තා වගේ.',
+          option4: 'වඳින්න ගිය දේවාලේ ඉහේ කඩා වැටුණ වගේ.',
+          correctOption: 3,
+          explanation: 'නිවැරදි පිළිතුර: (3)'),
+      QuestionModel(
+          id: 'sin_q27',
+          subjectId: 'sinhala',
+          questionText: 'තමාගේ ම වරදින් විනාශයක් කරා ළඟා වීම - ගැළපෙන පිරුළ?',
+          option1: 'මාළුවා නැහෙන්නේ කට නිසාලු.',
+          option2: 'වත්ත බද්දට දී ඇස්සට දත නියවනවා ලු.',
+          option3: 'කලක දි වහලු කලක දි රහ වෙනවා ලු.',
+          option4: 'ඌරො කැකුණ තළන කොට හබන් කුකුළන්ට රජ මඟුල් ලු.',
+          correctOption: 1,
+          explanation: 'නිවැරදි පිළිතුර: (1)'),
+      QuestionModel(
+          id: 'sin_q28',
+          subjectId: 'sinhala',
+          questionText:
+              'ද්විත්ව රූප හා පරරූප සන්ධියට අදාළ නිදසුන් පිළිවෙළින් දැක්වෙන වරණය?',
+          option1: 'අද්දැකීම, සන්නස්',
+          option2: 'සන්නස්, අද්දැකීම',
+          option3: 'පත්තිරු, අද්දැකීම',
+          option4: 'සන්නස්, පත්තිරු',
+          correctOption: 1,
+          explanation: 'නිවැරදි පිළිතුර: (1)'),
+      QuestionModel(
+          id: 'sin_q29',
+          subjectId: 'sinhala',
+          questionText: 'ව්‍යාකරණානුකූල ව නිවැරදි වාක්‍යය?',
+          option1: 'ශිෂ්‍ය - ශිෂ්‍යාවෝ උදෑසන ම පාසලට පැමිණ ඇත.',
+          option2: 'සොර මුළ ධනය පැහැර ගනියි.',
+          option3: 'ඈ ප්‍රසිද්ධ ලේඛිකාවක් වූවා ය.',
+          option4: 'රජතුමා සිංහයෙක් සේ නිර්භීත විය.',
+          correctOption: 3,
+          explanation: 'නිවැරදි පිළිතුර: (3)'),
+      QuestionModel(
+          id: 'sin_q30',
+          subjectId: 'sinhala',
+          questionText: 'ව්‍යාකරණානුකූල ව නිවැරදි වාක්‍යය ?',
+          option1: 'අම්මා හෝ තාත්තා රෝහලට යන්නේය.',
+          option2: 'ගවයෝ කුඹුරු පාළු කරතිය ගොවීහු චෝදනා කරති.',
+          option3: 'තාරකාවන් බටහිර දිග අහසේ දිලිසෙති.',
+          option4: 'ශිෂ්‍යයාද තෝ ද පාසලට යහි.',
+          correctOption: 1,
+          explanation: 'නිවැරදි පිළිතුර: (1)'),
     ],
     'sci': [
       QuestionModel(
@@ -1468,7 +1786,7 @@ class FirebaseService {
       'iconName': 'book',
       'imageUrl':
           'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=400&q=80',
-      'totalQuestions': 0,
+      'totalQuestions': 30,
       'completedRate': 0.0
     },
     {
@@ -1661,16 +1979,32 @@ class FirebaseService {
             .doc(subjectId)
             .collection('questions')
             .get();
-        return newSnap.docs
+        final questions = newSnap.docs
             .map((d) =>
                 QuestionModel.fromMap(d.data(), id: d.id, subjectId: subjectId))
             .toList();
+        questions.sort((a, b) {
+          final numA =
+              int.tryParse(a.id?.replaceAll(RegExp(r'[^0-9]'), '') ?? '0') ?? 0;
+          final numB =
+              int.tryParse(b.id?.replaceAll(RegExp(r'[^0-9]'), '') ?? '0') ?? 0;
+          return numA.compareTo(numB);
+        });
+        return questions;
       }
 
-      return snap.docs
+      final questions = snap.docs
           .map((d) =>
               QuestionModel.fromMap(d.data(), id: d.id, subjectId: subjectId))
           .toList();
+      questions.sort((a, b) {
+        final numA =
+            int.tryParse(a.id?.replaceAll(RegExp(r'[^0-9]'), '') ?? '0') ?? 0;
+        final numB =
+            int.tryParse(b.id?.replaceAll(RegExp(r'[^0-9]'), '') ?? '0') ?? 0;
+        return numA.compareTo(numB);
+      });
+      return questions;
     } catch (_) {
       _isOfflineMode = true;
       return getQuestionsBySubject(subjectId);
@@ -1709,12 +2043,14 @@ class FirebaseService {
           .toList();
       _offlineAnswers[mockResultId] = updatedAnswers;
 
-      // Update student stats locally
+      // Update student stats locally (only this user's results)
       int totalCorrect = 0;
       int totalQs = 0;
       for (var res in _offlineResults) {
-        totalCorrect += res.score;
-        totalQs += res.totalQuestions;
+        if (res.studentId == result.studentId) {
+          totalCorrect += res.score;
+          totalQs += res.totalQuestions;
+        }
       }
       final double newAvgScore =
           totalQs > 0 ? (totalCorrect / totalQs) * 100 : 0.0;
@@ -1733,12 +2069,14 @@ class FirebaseService {
           .collection('users')
           .doc(result.studentId)
           .collection('results')
-          .doc();
+          .doc(result.subjectId); // Use subjectId to overwrite and keep only one record per subject
 
+      // To handle answers, we can't easily batch delete a subcollection. 
+      // But we can overwrite the result document.
       batch.set(resultRef, result.toMap());
 
       for (var answer in answers) {
-        final answerRef = resultRef.collection('answers').doc();
+        final answerRef = resultRef.collection('answers').doc(answer.questionId); // Overwrite old answers using questionId
         batch.set(answerRef, {
           'resultId': resultRef.id,
           'questionId': answer.questionId,
@@ -1784,6 +2122,48 @@ class FirebaseService {
     } catch (_) {
       _isOfflineMode = true;
       return saveQuizResult(result, answers);
+    }
+  }
+
+  // Get highest scores by subject for a given student
+  Future<Map<String, QuizResultModel>> getHighestScoresBySubject(String studentId) async {
+    final Map<String, QuizResultModel> highestScores = {};
+    final validSubjectIds = _subjectSeedData.map((e) => e['id'] as String).toSet();
+
+    if (_isOfflineMode) {
+      for (var result in _offlineResults) {
+        if (result.studentId == studentId && validSubjectIds.contains(result.subjectId)) {
+          final existing = highestScores[result.subjectId];
+          if (existing == null || result.score > existing.score) {
+            highestScores[result.subjectId] = result;
+          }
+        }
+      }
+      return highestScores;
+    }
+
+    try {
+      final snap = await _db
+          .collection('users')
+          .doc(studentId)
+          .collection('results')
+          .get();
+
+      for (var doc in snap.docs) {
+        final result = QuizResultModel.fromMap(doc.data(), id: doc.id);
+        
+        // Filter out corrupted records where subjectId is an auto-generated Firebase ID
+        if (!validSubjectIds.contains(result.subjectId)) continue;
+
+        final existing = highestScores[result.subjectId];
+        if (existing == null || result.score > existing.score) {
+          highestScores[result.subjectId] = result;
+        }
+      }
+      return highestScores;
+    } catch (_) {
+      _isOfflineMode = true;
+      return getHighestScoresBySubject(studentId);
     }
   }
 
@@ -2256,6 +2636,366 @@ class FirebaseService {
     }
 
     await batch2.commit();
+
+    // Sinhala questions — seeded with fixed IDs (idempotent)
+    const String sinhalaId = 'sinhala';
+    final sinhalaQuestions = [
+      {
+        'id': 'sin_q1',
+        'subjectId': sinhalaId,
+        'questionText':
+            'ඔහුගෙන් වචනයක් ගැනීම වනාහි ගලෙන් පට්ටයක් ගැනීම වැනි කාර්යයකි.',
+        'option1': 'අමාරුවෙන් කළ යුත්තකි.',
+        'option2': 'ඉතා පහසු කටයුත්තකි.',
+        'option3': 'ශරීර ශක්තිය යොදා කළ යුත්තකි.',
+        'option4': 'කිසිදා සිදු කළ නොහැක්කකි.',
+        'correctOption': 4,
+        'explanation': 'නිවැරදි පිළිතුර: (4)'
+      },
+      {
+        'id': 'sin_q2',
+        'subjectId': sinhalaId,
+        'questionText': 'මා දුන් අඹගෙඩිය, දුගියා තලු මරමින් කෑවේ ය.',
+        'option1': 'ඉතා ම ආශාවෙන්',
+        'option2': 'කටින් හඬක් පිට කරමින්',
+        'option3': 'තල්ලෙහි ගෑවෙන පරිද්දෙන්',
+        'option4': 'ඉතා අකමැත්තෙන්',
+        'correctOption': 1,
+        'explanation': 'නිවැරදි පිළිතුර: (1)'
+      },
+      {
+        'id': 'sin_q3',
+        'subjectId': sinhalaId,
+        'questionText':
+            'සිරිපාල දිය යටින් ගින්දර ගෙනියන පුද්ගලයකු සේ ප්‍රසිද්ධ ය.',
+        'option1': 'උපක්‍රමශීලී ව වැඩ නොකරන',
+        'option2': 'අන්‍යයා තළා - පෙළා වැඩ කරන',
+        'option3': 'කට්ට, කෛරාටික, වංචනික ක්‍රියා කරන',
+        'option4': 'අන් අයට කළ නොහැකි දේ කරන',
+        'correctOption': 3,
+        'explanation': 'නිවැරදි පිළිතුර: (3)'
+      },
+      {
+        'id': 'sin_q4',
+        'subjectId': sinhalaId,
+        'questionText':
+            'යමක් ඇති සැටියෙන් වර්ණනා කිරීම ........................ වේ.',
+        'option1': 'ස්වභාවාලංකාරය',
+        'option2': 'ස්වභාවෝක්ත්‍යාලංකාරය',
+        'option3': 'ස්වභාව සිද්ධාලංකාරය',
+        'option4': 'ස්වභාව ධර්මාලංකාරය',
+        'correctOption': 2,
+        'explanation': 'නිවැරදි පිළිතුර: (2)'
+      },
+      {
+        'id': 'sin_q5',
+        'subjectId': sinhalaId,
+        'questionText':
+            'තමාගෙන් වූ වරද ඔවුහු ........................ ලක් කළහ.',
+        'option1': 'සාධාරණීකරණයට',
+        'option2': 'අසාධාරණීකරණයට',
+        'option3': 'වර්ගීකරණයට',
+        'option4': 'ප්‍රමිතිකරණයට',
+        'correctOption': 1,
+        'explanation': 'නිවැරදි පිළිතුර: (1)'
+      },
+      {
+        'id': 'sin_q6',
+        'subjectId': sinhalaId,
+        'questionText':
+            'ඇතැමුන් ජනප්‍රසාදය අහිමි කර ගත්තේ තම ........................ නිසාය.',
+        'option1': 'අවංකකම',
+        'option2': 'අනතිමානීකම',
+        'option3': 'ගුණවත්කම',
+        'option4': 'උද්ධච්චකම',
+        'correctOption': 4,
+        'explanation': 'නිවැරදි පිළිතුර: (4)'
+      },
+      {
+        'id': 'sin_q7',
+        'subjectId': sinhalaId,
+        'questionText': 'ආකාරාදි පිළිවෙළ නිවැරදිව දැක්වෙන පද පේළිය තෝරන්න.',
+        'option1': 'තිසරය, කෝකිලය, නීලකොබෝව, සැවුලුව',
+        'option2': 'ගිරාව, මයුරය, සැළලිහිණිය, හංසය',
+        'option3': 'රත්නාවලිය, පූජාවලිය, බුත්සරණ, ධර්ම ප්‍රදීපිකාව',
+        'option4': 'සසදාවත, මුවදෙව්දාවත, කව්සිළුමිණ, කාව්‍යශේඛරය',
+        'correctOption': 2,
+        'explanation': 'නිවැරදි පිළිතුර: (2)'
+      },
+      {
+        'id': 'sin_q8',
+        'subjectId': sinhalaId,
+        'questionText':
+            'සැම පදයකම අක්ෂර වින්‍යාසය නිවැරදි ව යෙදී ඇති පද පේළිය?',
+        'option1': 'සම්මුඛ, සුකුමාළ, සිතුමිණ, චුම්භක',
+        'option2': 'ගුරුමුෂ්ඨි, ගොලුවා, චන්ද්‍ර ග්‍රහණ, තොටුපොල',
+        'option3': 'පරිඥාණ, පරිපූර්ණ, යුද්ධායුද, ශික්ෂණ',
+        'option4': 'ආරූඪ, මිනුම, ශීතෝෂ්ණ, සහස්‍ර',
+        'correctOption': 4,
+        'explanation': 'නිවැරදි පිළිතුර: (4)'
+      },
+      {
+        'id': 'sin_q9',
+        'subjectId': sinhalaId,
+        'questionText':
+            'දීර්ඝ පාපිල්ල, කොම්බුව, දීර්ඝ ඇදය, කෙටි ඉස්පිල්ල අනුපිළිවෙළින් ඇති වරණය?',
+        'option1': 'සූරයා, කේතලය, නෑකම, විපත',
+        'option2': 'නෑකම, කේතලය, සූරයා, විපත',
+        'option3': 'සූරයා, විපත, නෑකම, කේතලය',
+        'option4': 'නෑකම, විපත, කේතලය, සූරයා',
+        'correctOption': 1,
+        'explanation': 'නිවැරදි පිළිතුර: (1)'
+      },
+      {
+        'id': 'sin_q10',
+        'subjectId': sinhalaId,
+        'questionText': 'ඕෂ්ඨජ ව්‍යංජන පමණක් අන්තර්ගත වචනය?',
+        'option1': 'භය',
+        'option2': 'මල',
+        'option3': 'පඹ',
+        'option4': 'පස',
+        'correctOption': 3,
+        'explanation': 'නිවැරදි පිළිතුර: (3)'
+      },
+      {
+        'id': 'sin_q11',
+        'subjectId': sinhalaId,
+        'questionText': '"ඇළ දොළ" යන්න අයත් වන්නේ,',
+        'option1': 'අන්‍යාර්ථ සමාසයට ය.',
+        'option2': 'විභක්ති සමාසයට ය.',
+        'option3': 'දකාරාර්ථ සමාසයට ය.',
+        'option4': 'අව්‍යය සමාසයට ය.',
+        'correctOption': 3,
+        'explanation': 'නිවැරදි පිළිතුර: (3)'
+      },
+      {
+        'id': 'sin_q12',
+        'subjectId': sinhalaId,
+        'questionText': 'අනුක්ත නාම පද පමණක් යෙදී ඇති වරණය?',
+        'option1': 'සාවකු, ගෙම්බෙක්, වනචාරියකු, දෙවඟනක',
+        'option2': 'වහලකු, දුනුවායන්, අප, සහෘදයෝ',
+        'option3': 'කපුටෙකු, යෞවනියක්, ක්‍රීඩිකාවක, මා',
+        'option4': 'සොල්දාදුවකු, මාළුවකු, ව්‍යාපාරිකයන්, තොප',
+        'correctOption': 1,
+        'explanation': 'නිවැරදි පිළිතුර: (1)'
+      },
+      {
+        'id': 'sin_q13',
+        'subjectId': sinhalaId,
+        'questionText': '"කාර්යාලයෙන්" යන්නෙහි විභක්තිය කුමක්ද?',
+        'option1': 'අවධි විභක්තිය',
+        'option2': 'ආධාර විභක්තිය',
+        'option3': 'සම්ප්‍රදාන විභක්තිය',
+        'option4': 'කර්ම විභක්තිය',
+        'correctOption': 1,
+        'explanation': 'නිවැරදි පිළිතුර: (1)'
+      },
+      {
+        'id': 'sin_q14',
+        'subjectId': sinhalaId,
+        'questionText': 'නීති + ඉක = ?',
+        'option1': 'නෛතික',
+        'option2': 'නීතියික',
+        'option3': 'නෛතීක',
+        'option4': 'නීතික',
+        'correctOption': 1,
+        'explanation': 'නිවැරදි පිළිතුර: (1)'
+      },
+      {
+        'id': 'sin_q15',
+        'subjectId': sinhalaId,
+        'questionText': 'කෘදන්ත ප්‍රවර්ගයට නොගැලපෙන පදය ඇති වරණය?',
+        'option1': 'පූර්ව ක්‍රියා - කා, නා, පා, දා',
+        'option2': 'කෘදන්ත - සරන, කරන, දරන, පරණ',
+        'option3': 'ස්වර සන්ධි - මලසුන, මතැත්, එදිනෙදා, සිතැති',
+        'option4': 'උපසර්ග - විරූප, විදේශ, විසන්ධි, විරාග',
+        'correctOption': 2,
+        'explanation': 'නිවැරදි පිළිතුර: (2)'
+      },
+      {
+        'id': 'sin_q16',
+        'subjectId': sinhalaId,
+        'questionText': 'මිශ්‍ර ක්‍රියාවක් යෙදී ඇති වාක්‍යය?',
+        'option1': 'සිහි කොට පින් දෙන්න.',
+        'option2': 'ඔවුහු මිතුදමින් වෙළී සිටියහ.',
+        'option3': 'ඔහු ගුණවත්කමින් පිරිපුන් මිනිසෙක් වූයේය.',
+        'option4': 'නිමාශා දක්ෂතා විදහා පාමින් ගීයක් ගැයුවාය.',
+        'correctOption': 4,
+        'explanation': 'නිවැරදි පිළිතුර: (4)'
+      },
+      {
+        'id': 'sin_q17',
+        'subjectId': sinhalaId,
+        'questionText': '"නිරාගමික" යන්නෙහි අර්ථය?',
+        'option1': 'ආගමකට අයත් වූ',
+        'option2': 'ආගමානුකූල හැඟීමෙන් යුතු',
+        'option3': 'ආගමකට අයත් නැති',
+        'option4': 'වැරදි ආගමික අදහස් සහිත',
+        'correctOption': 3,
+        'explanation': 'නිවැරදි පිළිතුර: (3)'
+      },
+      {
+        'id': 'sin_q18',
+        'subjectId': sinhalaId,
+        'questionText': '"රණ ශූරයෙකි" යන්නෙහි අර්ථය?',
+        'option1': 'යුද්ධයෙහි දක්ෂ නොවූවෙකි.',
+        'option2': 'යුද්ධ ජයග්‍රහණයේ දක්ෂයෙකි.',
+        'option3': 'යුද්ධකාමියෙකි.',
+        'option4': 'යුද්ධයෙහි දක්ෂයෙකි.',
+        'correctOption': 4,
+        'explanation': 'නිවැරදි පිළිතුර: (4)'
+      },
+      {
+        'id': 'sin_q19',
+        'subjectId': sinhalaId,
+        'questionText': '"අතීතාවර්ජනයක" යන්නෙහි අර්ථය?',
+        'option1': 'අතීතය අමතක කිරීමක',
+        'option2': 'අතීතයට ගමන් කිරීමක',
+        'option3': 'අතීතය ගැන මතක් කිරීමක',
+        'option4': 'අතීතයේ ජීවත් වීමක',
+        'correctOption': 3,
+        'explanation': 'නිවැරදි පිළිතුර: (3)'
+      },
+      {
+        'id': 'sin_q20',
+        'subjectId': sinhalaId,
+        'questionText': 'සමීප කාර්‍යයන් සමග බැඳී නොපවත්නා පද පේළිය?',
+        'option1': 'අල්මාරිය, පෙට්ටිය, ලාච්චුව, පුටුව',
+        'option2': 'ඉටිපන්දම්, හඳුන්කූරු, පහන්, කපුරු',
+        'option3': 'පොල්, ලුණු, දුරු, මිරිස්',
+        'option4': 'කොට්ටය, ඇඳ මෙට්ටය, ඇතිරිල්ල',
+        'correctOption': 1,
+        'explanation': 'නිවැරදි පිළිතුර: (1)'
+      },
+      {
+        'id': 'sin_q21',
+        'subjectId': sinhalaId,
+        'questionText': 'සමානාර්ථ යෙදුම් පමණක් ඇතුළත් වරණය?',
+        'option1': 'දේව-සුර, භෝජන-ආහාර, මුහුද-ජලාශය, වාහනය-රථය',
+        'option2': 'මිනිසා-මනුෂ්‍යයා, සවන-කන, නේත්‍ර-නයන, නගරය-නුවර',
+        'option3': 'වාලුකා-වැලි, ගෘහය-ගෙය, භාග්‍යය-දුක, තරුණ-යොවුන්',
+        'option4': 'ප්‍රාසාදය-පහය, සත්‍යය-ඇත්ත, දිනය-වර්ෂය, කුඹුර-ක්ෂේත්‍රය',
+        'correctOption': 2,
+        'explanation': 'නිවැරදි පිළිතුර: (2)'
+      },
+      {
+        'id': 'sin_q22',
+        'subjectId': sinhalaId,
+        'questionText': '"කාලය" යනයේ සමානාර්ථ නොවන පදයක් ඇති වරණය?',
+        'option1': 'කාලය - වේලාව, තල, නිමේෂය, දහවල',
+        'option2': 'ශරීරය - දේහය, සිරුර, කය, ඇඟ',
+        'option3': 'කුරුල්ලා - ශකුන, පක්ෂියා, විහඟ, දද',
+        'option4': 'හස්ති - ගජ, වරණ, ඇතා, ගිජිඳු',
+        'correctOption': 1,
+        'explanation': 'නිවැරදි පිළිතුර: (1)'
+      },
+      {
+        'id': 'sin_q23',
+        'subjectId': sinhalaId,
+        'questionText': 'විරුද්ධාර්ථවත් පද යුගලයක් ඇතුළත් නොවන වරණය?',
+        'option1': 'විමල - නිමල',
+        'option2': 'ආදර - අනාදර',
+        'option3': 'ඵල - අඵල',
+        'option4': 'හුරු - නුහුරු',
+        'correctOption': 1,
+        'explanation': 'නිවැරදි පිළිතුර: (1)'
+      },
+      {
+        'id': 'sin_q24',
+        'subjectId': sinhalaId,
+        'questionText': 'වැරදි අදහස දෙන ප්‍රකාශය?',
+        'option1': '"නුඹ" යනු මධ්‍යම පුරුෂ බහු වචනයකි.',
+        'option2': 'ඍ යන්න මූර්ධජ අක්ෂරයකි.',
+        'option3': '"බලමි" යන්න වර්තමාන කාල, උත්තම පුරුෂ, ඒකවචනයකි.',
+        'option4': '"බලවත්" යන්න තද්ධිත පදයකි.',
+        'correctOption': 1,
+        'explanation': 'නිවැරදි පිළිතුර: (1)'
+      },
+      {
+        'id': 'sin_q25',
+        'subjectId': sinhalaId,
+        'questionText': 'මනා පද ගැළපීමෙන් යුක්ත අර්ථාන්විත වාක්‍යය?',
+        'option1': 'සාහිත්‍ය නිර්මාණයක් පදනම් වී වස්තු බීජයක් ඇති කෙරේ.',
+        'option2': 'යුද්ධයක් නිසා ස්ථාවරත්වයට හේතු වේ.',
+        'option3': 'සතුරන්ගේ ආක්‍රමණවලට අප උපක්‍රමශීලී විය යුතු ය.',
+        'option4': 'තොරතුරු යාවත්කාලීන කිරීම ප්‍රගමනයට උපකාරී වෙයි.',
+        'correctOption': 4,
+        'explanation': 'නිවැරදි පිළිතුර: (4)'
+      },
+      {
+        'id': 'sin_q26',
+        'subjectId': sinhalaId,
+        'questionText': 'ඉඟුරු දී මිරිස් ගත්තා — මෙයින් ගැළපෙන අදහස?',
+        'option1': 'කන්න දුන්නා හපා කෑව',
+        'option2': 'ලොකු ලොකු ඉලක්ක කොට ගැනීම',
+        'option3': 'තිබෙන දෙයටත් වඩා අයහපත් දෙය ළං කරගැනීම',
+        'option4': 'වඩාත් හොඳ ප්‍රතිඵල ලැබීම',
+        'correctOption': 3,
+        'explanation': 'නිවැරදි පිළිතුර: (3)'
+      },
+      {
+        'id': 'sin_q27',
+        'subjectId': sinhalaId,
+        'questionText': 'තමාගේ ම වරදින් විනාශයට ළඟා වීම — ගැළපෙන පිරුළ?',
+        'option1': 'මාළුවා නැහෙන්නේ කට නිසාලු.',
+        'option2': 'වත්ත බද්දට දී ඇස්සට දත නියවනවා ලු.',
+        'option3': 'කලක දි වහලු කලක දි රහ වෙනවා ලු.',
+        'option4': 'ඌරො කැකුණ තළන කොට හබන් කුකුළන්ට රජ මඟුල් ලු.',
+        'correctOption': 1,
+        'explanation': 'නිවැරදි පිළිතුර: (1)'
+      },
+      {
+        'id': 'sin_q28',
+        'subjectId': sinhalaId,
+        'questionText': 'ද්විත්ව රූප හා පරරූප සන්ධි නිදසුන් පිළිවෙළ?',
+        'option1': 'අද්දැකීම, සන්නස්',
+        'option2': 'සන්නස්, අද්දැකීම',
+        'option3': 'පත්තිරු, අද්දැකීම',
+        'option4': 'සන්නස්, පත්තිරු',
+        'correctOption': 1,
+        'explanation': 'නිවැරදි පිළිතුර: (1)'
+      },
+      {
+        'id': 'sin_q29',
+        'subjectId': sinhalaId,
+        'questionText': 'ව්‍යාකරණානුකූල ව නිවැරදි වාක්‍යය?',
+        'option1': 'ශිෂ්‍ය - ශිෂ්‍යාවෝ උදෑසන ම පාසලට පැමිණ ඇත.',
+        'option2': 'සොර මුළ ධනය පැහැර ගනියි.',
+        'option3': 'ඈ ප්‍රසිද්ධ ලේඛිකාවක් වූවා ය.',
+        'option4': 'රජතුමා සිංහයෙක් සේ නිර්භීත විය.',
+        'correctOption': 3,
+        'explanation': 'නිවැරදි පිළිතුර: (3)'
+      },
+      {
+        'id': 'sin_q30',
+        'subjectId': sinhalaId,
+        'questionText': 'ව්‍යාකරණානුකූල ව නිවැරදි වාක්‍යය (2)?',
+        'option1': 'අම්මා හෝ තාත්තා රෝහලට යන්නේය.',
+        'option2': 'ගවයෝ කුඹුරු පාළු කරතිය ගොවීහු චෝදනා කරති.',
+        'option3': 'තාරකාවන් බටහිර දිග අහසේ දිලිසෙති.',
+        'option4': 'ශිෂ්‍යයාද තෝ ද පාසලට යහි.',
+        'correctOption': 1,
+        'explanation': 'නිවැරදි පිළිතුර: (1)'
+      },
+    ];
+
+    final batchSinhala = _db.batch();
+    for (var q in sinhalaQuestions) {
+      final id = q['id'] as String;
+      final data = Map<String, dynamic>.from(q)..remove('id');
+      final ref = _db
+          .collection('subjects')
+          .doc(sinhalaId)
+          .collection('questions')
+          .doc(id);
+      batchSinhala.set(ref, data, SetOptions(merge: true));
+    }
+    await batchSinhala.commit();
+
+    await _db
+        .collection('subjects')
+        .doc(sinhalaId)
+        .update({'totalQuestions': 30});
 
     // History questions — seeded with fixed IDs (idempotent)
     const String historyId = 'history';
