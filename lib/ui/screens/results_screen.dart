@@ -116,7 +116,7 @@ class _ResultsScreenState extends State<ResultsScreen>
           if (hasRecentResult)
             Positioned.fill(
               child: Opacity(
-                opacity: 0.18,
+                opacity: 0.55,
                 child: EmojiRain(emojis: config.emojis, count: 22),
               ),
             ),
@@ -189,8 +189,58 @@ class _ResultsScreenState extends State<ResultsScreen>
                           ),
                           const SizedBox(height: 14),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
+                              // Review button - bottom left of pink card
+                              Consumer<QuizProvider>(
+                                builder: (context, qp, _) {
+                                  final isOpen = qp.showReviewPanel;
+                                  return GestureDetector(
+                                    onTap: () => qp.toggleReviewPanel(),
+                                    child: AnimatedContainer(
+                                      duration: const Duration(milliseconds: 250),
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: isOpen
+                                            ? Colors.white
+                                            : const Color(0xFFE91E8C).withValues(alpha: 0.85),
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color: Colors.white.withValues(alpha: 0.6),
+                                          width: 1.5,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withValues(alpha: 0.15),
+                                            blurRadius: 6,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            isOpen ? Icons.visibility_off_rounded : Icons.rate_review_rounded,
+                                            size: 14,
+                                            color: isOpen ? const Color(0xFFE91E8C) : Colors.white,
+                                          ),
+                                          const SizedBox(width: 5),
+                                          Text(
+                                            isOpen ? 'Hide Review' : 'Review',
+                                            style: TextStyle(
+                                              color: isOpen ? const Color(0xFFE91E8C) : Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              // Subject tag - bottom right
                               if (subjectName.isNotEmpty)
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -327,8 +377,10 @@ class _ResultsScreenState extends State<ResultsScreen>
                 SizedBox(
                   height: 52,
                   child: ElevatedButton.icon(
-                    onPressed: () =>
-                        Navigator.popUntil(context, (route) => route.isFirst),
+                    onPressed: () {
+                      context.read<QuizProvider>().clearLastResult();
+                      Navigator.popUntil(context, (route) => route.isFirst);
+                    },
                     icon: const Icon(Icons.home_rounded),
                     label: const Text('Back to Home',
                         style: TextStyle(fontSize: 16)),
@@ -344,7 +396,10 @@ class _ResultsScreenState extends State<ResultsScreen>
                 SizedBox(
                   height: 52,
                   child: OutlinedButton.icon(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () {
+                      context.read<QuizProvider>().clearLastResult();
+                      Navigator.pop(context);
+                    },
                     icon: const Icon(Icons.replay_rounded),
                     label: const Text('Try Again',
                         style: TextStyle(fontSize: 16)),

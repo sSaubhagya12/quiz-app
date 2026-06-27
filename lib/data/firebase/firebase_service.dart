@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/student_model.dart';
 import '../models/subject_model.dart';
@@ -1940,6 +1940,26 @@ class FirebaseService {
           .collection('questions')
           .get();
 
+      // Force sync for ICT, Civic, Business subjects (data stored in dedicated seed methods)
+      if (subjectId == 'ict' || subjectId == 'civic' || subjectId == 'business') {
+        final cleanBatch = _db.batch();
+        for (var doc in snap.docs) {
+          cleanBatch.delete(doc.reference);
+        }
+        await cleanBatch.commit();
+        if (subjectId == 'ict') await _seedIctQuestions();
+        if (subjectId == 'civic') await _seedCivicQuestions();
+        if (subjectId == 'business') await _seedBusinessQuestions();
+        final newSnap = await _db.collection('subjects').doc(subjectId).collection('questions').get();
+        final qs = newSnap.docs.map((d) => QuestionModel.fromMap(d.data(), id: d.id, subjectId: subjectId)).toList();
+        qs.sort((a, b) {
+          final numA = int.tryParse(a.id?.replaceAll(RegExp(r'[^0-9]'), '') ?? '0') ?? 0;
+          final numB = int.tryParse(b.id?.replaceAll(RegExp(r'[^0-9]'), '') ?? '0') ?? 0;
+          return numA.compareTo(numB);
+        });
+        return qs;
+      }
+
       // Firebase eke questions adu nam _offlineQuestions walen auto-seed karamu
       final offlineQs = _offlineQuestions[subjectId];
       if (offlineQs != null && snap.docs.length < offlineQs.length) {
@@ -3358,5 +3378,48 @@ class FirebaseService {
         .collection('subjects')
         .doc(historyId)
         .update({'totalQuestions': 30});
+
+  Future<void> _seedIctQuestions() async {
+    const ictId = 'ict';
+    final ictQuestions = [
+      {'id':'ict_q1','subjectId':ictId,'questionText':'මේස පරිගණකයකින් (Desktop Computer) සාමාන්‍යයෙන් ලැබෙන ප්‍රධාන වාසිය:','option1':'බැටරියෙන් ක්‍රියාත්මක වීම','option2':'රැගෙන යාමේ පහසුව','option3':'වඩා විශාල Monitor එකක් සම්බන්ධ කිරීමේ හැකියාව','option4':'සැහැල්ලු නිමැවුම','correctOption':3,'explanation':'Desktop computers support large monitors and more peripherals than laptops.'},
+      {'id':'ict_q2','subjectId':ictId,'questionText':'OS සහ මෘදුකාංගවල උපදෙස් ක්‍රියාත්මක වන්නේ:','option1':'Cache Memory','option2':'RAM','option3':'Processor (CPU)','option4':'Secondary Storage','correctOption':3,'explanation':'CPU executes all program instructions — it is the brain of the computer.'},
+      {'id':'ict_q3','subjectId':ictId,'questionText':'Input device නොවන්නේ කුමක්ද?','option1':'Keyboard','option2':'Mouse','option3':'Printer','option4':'Scanner','correctOption':3,'explanation':'Printer is an output device; it produces output, not input.'},
+      {'id':'ict_q4','subjectId':ictId,'questionText':'1 Kilobyte (KB) = කී Bytes ද?','option1':'1000','option2':'1024','option3':'100','option4':'10000','correctOption':2,'explanation':'1 KB = 1024 Bytes (binary system).'},
+      {'id':'ict_q5','subjectId':ictId,'questionText':'ROM (Read Only Memory) ලක්ෂණය:','option1':'Volatile memory','option2':'Power off වූ විට data නැතිවේ','option3':'Non-volatile — power off වුවත් data රැකේ','option4':'තාවකාලික ගබඩාවකි','correctOption':3,'explanation':'ROM is non-volatile; BIOS/firmware stored permanently.'},
+      {'id':'ict_q6','subjectId':ictId,'questionText':'සීමිත ප්‍රදේශයක (ගොඩනැගිල්ලක) ජාලය:','option1':'WAN','option2':'MAN','option3':'LAN','option4':'Internet','correctOption':3,'explanation':'LAN (Local Area Network) connects devices within a limited area like a school or building.'},
+      {'id':'ict_q7','subjectId':ictId,'questionText':'256MB ඉඩ ඇති USB එකට 0.3GB ගොනු paste කළහොත්:','option1':'ගොනුව සාර්ථකව paste වේ','option2':'ඉඩ මදි නිසා paste කළ නොහැක','option3':'ගොනුවෙන් අඩක් paste වේ','option4':'ධාවකය format වේ','correctOption':2,'explanation':'0.3GB≈307MB > 256MB ∴ paste කළ නොහැක.'},
+      {'id':'ict_q8','subjectId':ictId,'questionText':'ASCII හි A=65 නම්, 67 නිරූපණය කරන්නේ:','option1':'B','option2':'C','option3':'D','option4':'E','correctOption':2,'explanation':'65=A, 66=B, 67=C.'},
+      {'id':'ict_q9','subjectId':ictId,'questionText':'Operating System හි මූලික කාර්යයක් නොවන්නේ:','option1':'Memory Management','option2':'File Management','option3':'Word document අක්ෂර වැරදි නිවැරදි කිරීම','option4':'Process Management','correctOption':3,'explanation':'Spell check = Application software; OS කාර්යයක් නොවේ.'},
+      {'id':'ict_q10','subjectId':ictId,'questionText':'Word Processing: A-Password යෙදා save කළ හැක. B-.pdf ලෙස save කළ හැක. C-Save As භාවිත කළ හැක. නිවැරදි:','option1':'A සහ B පමණි','option2':'A සහ C පමණි','option3':'B සහ C පමණි','option4':'A, B සහ C සියල්ලම','correctOption':4,'explanation':'MS Word: password, PDF export, Save As — තුනම සිදු කළ හැකිය.'},
+      {'id':'ict_q11','subjectId':ictId,'questionText':'පාඨ කොටසක් දෙපසම සමාන (Justify) කිරීම:','option1':'Left align','option2':'Center align','option3':'Justify align','option4':'Right align','correctOption':3,'explanation':'Justify align = සියලු පේළි සම දිගකට.'},
+      {'id':'ict_q12','subjectId':ictId,'questionText':'H₂O හි Subscript ලබා ගැනීමට:','option1':'X² (Superscript)','option2':'X₂ (Subscript)','option3':'Font color','option4':'Bold','correctOption':2,'explanation':'Subscript (X₂) = H₂O වැනි පහළ දර්ශක.'},
+      {'id':'ict_q13','subjectId':ictId,'questionText':'එකම ලිපිය ලිපින ලැයිස්තු සමඟ ස්වයංක්‍රීයව යැවීමේ feature:','option1':'Mail Merge','option2':'Macro','option3':'Hyperlink','option4':'Find and Replace','correctOption':1,'explanation':'Mail Merge: ලිපිය + ලිපින දත්ත = bulk ලේඛන.'},
+      {'id':'ict_q14','subjectId':ictId,'questionText':'Spreadsheet software ONLY ඇතුළත් වරණය:','option1':'MS Word, MS Excel, Google Sheets','option2':'Google Sheets, MS Excel, LibreOffice Calc','option3':'LibreOffice Writer, MS Excel, OpenOffice Calc','option4':'MS PowerPoint, Google Sheets, MS Excel','correctOption':2,'explanation':'Google Sheets, MS Excel, LibreOffice Calc = spreadsheet software.'},
+      {'id':'ict_q15','subjectId':ictId,'questionText':'A1:C3 cell range හි cells ගණන:','option1':'3','option2':'6','option3':'9','option4':'12','correctOption':3,'explanation':'3 columns × 3 rows = 9 cells.'},
+      {'id':'ict_q16','subjectId':ictId,'questionText':'A1:A5 sum ලබා ගැනීමට නිවැරදි function:','option1':'=SUM(A1-A5)','option2':'=SUM(A1:A5)','option3':'=ADD(A1:A5)','option4':'=TOTAL(A1..A5)','correctOption':2,'explanation':'=SUM(start:end) = නිවැරදි syntax.'},
+      {'id':'ict_q17','subjectId':ictId,'questionText':'Presentation software ONLY ඇතුළත් වරණය:','option1':'MS PowerPoint, LibreOffice Impress, Google Slides','option2':'MS Excel, Google Slides, Apple Keynote','option3':'MS PowerPoint, Audacity, VLC Player','option4':'Google Sheets, MS PowerPoint, Ubuntu','correctOption':1,'explanation':'PowerPoint, Impress, Slides = presentation software.'},
+      {'id':'ict_q18','subjectId':ictId,'questionText':'Database record අනන්‍යව හඳුනා ගැනීමට:','option1':'Foreign Key','option2':'Primary Key','option3':'Composite Key','option4':'Candidate Key','correctOption':2,'explanation':'Primary Key = uniquely identifies each record.'},
+      {'id':'ict_q19','subjectId':ictId,'questionText':'වගු දෙකක් සම්බන්ධ කිරීමේදී ලබාගත් Primary Key හඳුන්වන්නේ:','option1':'Primary Key','option2':'Foreign Key','option3':'Candidate Key','option4':'Super Key','correctOption':2,'explanation':'Foreign Key = වෙනත් table හි Primary Key.'},
+      {'id':'ict_q20','subjectId':ictId,'questionText':'DBMS ගැන නිවැරදි ප්‍රකාශය:','option1':'Data Redundancy පාලනය කළ නොහැකිය','option2':'Electronic DB හිදී data සෙවීම කාර්යක්ෂමය','option3':'Data type අනිවාර්ය නොවේ','option4':'Primary key null ලෙස තැබිය හැකිය','correctOption':2,'explanation':'Query ලෙස electronic DB හිදී ඉක්මනින් data සෙවිය හැකිය.'},
+      {'id':'ict_q21','subjectId':ictId,'questionText':'Flowchart හි Decision/Selection symbol:','option1':'Rectangle','option2':'Parallelogram','option3':'Diamond','option4':'Oval','correctOption':3,'explanation':'Diamond = Yes/No decision symbol.'},
+      {'id':'ict_q22','subjectId':ictId,'questionText':'Pascal හි constants ප්‍රකාශ කිරීමේ keyword:','option1':'var','option2':'const','option3':'program','option4':'begin','correctOption':2,'explanation':'const keyword = constants declaration in Pascal.'},
+      {'id':'ict_q23','subjectId':ictId,'questionText':'පැස්කල් භාෂාවේ පූර්ණ සංඛ්‍යා (Integers) ගබඩා කිරීමේ data type:','option1':'Real','option2':'Char','option3':'Integer','option4':'Boolean','correctOption':3,'explanation':'Integer = පූර්ණ සංඛ්‍යා; Real = දශම සහිත සංඛ්‍යා.'},
+      {'id':'ict_q24','subjectId':ictId,'questionText':'SDLC හි Coding ට පෙර සිදු කළ යුතු පියවර:','option1':'System Design','option2':'System Testing','option3':'System Maintenance','option4':'System Deployment','correctOption':1,'explanation':'Design → Coding → Testing → Deployment.'},
+      {'id':'ict_q25','subjectId':ictId,'questionText':'User විසින් system requirements සපුරාලනු ලැබේදැයි පරීක්ෂා කිරීම:','option1':'Unit Testing','option2':'Integration Testing','option3':'Acceptance Testing','option4':'System Testing','correctOption':3,'explanation':'Acceptance Testing = user/client validates the system.'},
+      {'id':'ict_q26','subjectId':ictId,'questionText':'නිවැරදි IPv4 ලිපිනය:','option1':'192.168.1.1','option2':'256.100.0.5','option3':'10.20.30','option4':'172.16.254.1.2','correctOption':1,'explanation':'IPv4: 4 octets, 0-255 each. 192.168.1.1 = valid.'},
+      {'id':'ict_q27','subjectId':ictId,'questionText':'HTML හි image embed කිරීමේ නිවැරදි tag:','option1':'<image src="pic.jpg">','option2':'<img> src="pic.jpg" </img>','option3':'<img src="pic.jpg">','option4':'<href img="pic.jpg">','correctOption':3,'explanation':'<img src="url"> = correct HTML image tag.'},
+      {'id':'ict_q28','subjectId':ictId,'questionText':'HTML හි විශාලම heading tag:','option1':'<heading>','option2':'<h6>','option3':'<h1_topic>','option4':'<h1>','correctOption':4,'explanation':'<h1> = largest heading, <h6> = smallest.'},
+      {'id':'ict_q29','subjectId':ictId,'questionText':'Vector vs Raster graphics නිවැරදි ප්‍රකාශය:','option1':'Raster විශාල කළ quality නොඅඩු වේ','option2':'Vector pixels වලින් සෑදී ඇත','option3':'Vector graphics quality නොවෙනස්ව resize කළ හැකිය','option4':'.jpg සහ .png = vector formats','correctOption':3,'explanation':'Vector = mathematical equations → scalable without pixelation.'},
+      {'id':'ict_q30','subjectId':ictId,'questionText':'අනුන්ගේ නිර්මාණය තමාගේ ලෙස ඉදිරිපත් කිරීම:','option1':'Digital Divide','option2':'Plagiarism','option3':'Software Piracy','option4':'Hacking','correctOption':2,'explanation':'Plagiarism = presenting others\' work as your own.'},
+    ];
+    final batchIct = _db.batch();
+    for (var q in ictQuestions) {
+      final id = q['id'] as String;
+      final data = Map<String, dynamic>.from(q)..remove('id');
+      batchIct.set(_db.collection('subjects').doc(ictId).collection('questions').doc(id), data, SetOptions(merge: true));
+    }
+    await batchIct.commit();
+    await _db.collection('subjects').doc(ictId).update({'totalQuestions': 30});
   }
 }

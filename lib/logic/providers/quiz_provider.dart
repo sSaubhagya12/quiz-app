@@ -250,8 +250,22 @@ class QuizProvider extends ChangeNotifier {
       _isQuizCompleted = true;
       _showReviewPanel = true;
 
-      // Review answers Firestore වෙතින් ලබාගැනීම
-      _reviewAnswers = await _firebaseService.getAnswersForQuizResult(studentId, resultId);
+      // Build review answers in-memory from the questions we already have
+      // (No Firebase answers fetch needed - answers not stored remotely)
+      _reviewAnswers = answersToSave.map((a) {
+        final question = _questions.firstWhere(
+          (q) => q.id == a.questionId,
+          orElse: () => _questions[0],
+        );
+        return StudentAnswerModel(
+          id: a.id,
+          resultId: resultId,
+          questionId: a.questionId,
+          selectedOption: a.selectedOption,
+          isCorrect: a.isCorrect,
+          question: question,
+        );
+      }).toList();
       
       // Fetch highest scores for the Results Screen
       await loadHighestScores(studentId);
@@ -276,7 +290,17 @@ class QuizProvider extends ChangeNotifier {
   }
 
   // ==========================================
-  // 5. REVIEW PANEL TOGGLE
+  // 5. CLEAR LAST RESULT (when user navigates away)
+  // ==========================================
+  void clearLastResult() {
+    _lastQuizResult = null;
+    _reviewAnswers = [];
+    _showReviewPanel = false;
+    notifyListeners();
+  }
+
+  // ==========================================
+  // 6. REVIEW PANEL TOGGLE
   // ==========================================
   void toggleReviewPanel() {
     _showReviewPanel = !_showReviewPanel;
