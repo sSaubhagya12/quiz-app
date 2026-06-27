@@ -4,9 +4,11 @@ import '../../logic/providers/auth_provider.dart';
 import '../../logic/providers/subject_provider.dart';
 import '../../logic/providers/quiz_provider.dart';
 import '../../logic/providers/theme_provider.dart';
+import '../../logic/providers/settings_provider.dart';
 import 'choose_subject_screen.dart';
 import 'profile_screen.dart';
 import 'quiz_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,26 +19,48 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  String _selectedLanguageCode = 'en'; // Default to English ('en') because of 'ENG' button
 
   @override
   void initState() {
     super.initState();
-    // Load subjects when home screen is opened
+    // Load subjects and highest scores when home screen is opened
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<SubjectProvider>().loadSubjects();
+      final authProvider = context.read<AuthProvider>();
+      if (authProvider.currentStudent?.uid != null) {
+        context.read<QuizProvider>().loadHighestScores(authProvider.currentStudent!.uid!);
+      }
     });
   }
 
-  void _onLanguageChanged(String langCode) {
-    setState(() {
-      _selectedLanguageCode = langCode;
-    });
+  static String _drawerLabel(String key, String lang) {
+    const labels = {
+      'en': {
+        'account': 'Account', 'notifications': 'Notification',
+        'darkmode': 'Dark mode', 'language': 'Language',
+        'help': 'Help and support', 'about': 'About',
+        'logout': 'Log out', 'delete': 'Delete Account',
+      },
+      'si': {
+        'account': 'ගිණුම', 'notifications': 'දැනුම්දීම්',
+        'darkmode': 'දාර්ක් මෝඩ්', 'language': 'භාෂාව',
+        'help': 'උදවු සහ සහයෝගය', 'about': 'ගැන',
+        'logout': 'අවහර වීම', 'delete': 'ගිණුම මකාදැමීම',
+      },
+      'ta': {
+        'account': 'கணக்கு', 'notifications': 'அறிவிப்புகள்',
+        'darkmode': 'இருள் மோட்', 'language': 'மொழி',
+        'help': 'உதவி & ஆதரவு', 'about': 'பற்றி',
+        'logout': 'வெளியேறு', 'delete': 'கணக்கை நீக்கு',
+      },
+    };
+    return labels[lang]?[key] ?? labels['en']![key]!;
   }
 
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
+    final settingsProvider = context.watch<SettingsProvider>();
     final student = authProvider.currentStudent;
     final themeProvider = context.watch<ThemeProvider>();
     final isDark = themeProvider.isDarkMode;
@@ -44,25 +68,144 @@ class _HomeScreenState extends State<HomeScreen> {
     final List<Widget> pages = [
       _HomeDashboard(
         student: student,
-        langCode: _selectedLanguageCode,
-        onLanguageChanged: _onLanguageChanged,
+        langCode: settingsProvider.langCode,
+        onLanguageChanged: (code) => settingsProvider.setLanguage(code),
         onViewAllSubjects: () => setState(() => _selectedIndex = 1),
         isDark: isDark,
       ),
       ChooseSubjectScreen(
         isEmbedded: true,
-        initialLangCode: _selectedLanguageCode,
-        onLanguageChanged: _onLanguageChanged,
+        initialLangCode: settingsProvider.langCode,
+        onLanguageChanged: (code) => settingsProvider.setLanguage(code),
       ),
       ProfileScreen(
         isEmbedded: true,
-        initialLangCode: _selectedLanguageCode,
-        onLanguageChanged: _onLanguageChanged,
+        initialLangCode: settingsProvider.langCode,
+        onLanguageChanged: (code) => settingsProvider.setLanguage(code),
       ),
     ];
 
+    final iconCol = isDark ? Colors.white70 : const Color(0xFF1E3C72);
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF4F6FC),
+      appBar: AppBar(
+        title: const Text('Quiz O-Level', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: isDark ? const Color(0xFF1E1E1E) : const Color(0xFF1E3C72),
+        foregroundColor: Colors.white,
+        elevation: 0,
+        actions: [
+          // Language picker in AppBar
+          PopupMenuButton<String>(
+            onSelected: (code) => settingsProvider.setLanguage(code),
+            icon: const Icon(Icons.language, color: Colors.white),
+            itemBuilder: (_) => const [
+              PopupMenuItem(value: 'en', child: Text('English')),
+              PopupMenuItem(value: 'si', child: Text('සිංහල')),
+              PopupMenuItem(value: 'ta', child: Text('தமிழ்')),
+            ],
+          ),
+          // User profile icon in AppBar
+          IconButton(
+            icon: const Icon(Icons.person_outline_rounded, color: Colors.white),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfileScreen(isEmbedded: false)),
+              );
+            },
+          ),
+        ],
+      ),
+      drawer: Drawer(
+        backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF121212) : const Color(0xFF1E3C72),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const Icon(Icons.school, size: 50, color: Colors.white),
+                  const SizedBox(height: 8),
+                  const Text('EduQuiz O-Level', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 4),
+                  Text(authProvider.currentStudent?.email ?? '', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.person_outline, color: iconCol),
+              title: Text(_drawerLabel('account', settingsProvider.langCode)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen(isEmbedded: false)));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.notifications_none_outlined, color: iconCol),
+              title: Text(_drawerLabel('notifications', settingsProvider.langCode)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen(initialSection: 'notification')));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.dark_mode_outlined, color: iconCol),
+              title: Text(_drawerLabel('darkmode', settingsProvider.langCode)),
+              trailing: Switch(
+                value: themeProvider.isDarkMode,
+                onChanged: (_) => themeProvider.toggleTheme(),
+              ),
+              onTap: () => themeProvider.toggleTheme(),
+            ),
+            ListTile(
+              leading: Icon(Icons.language, color: iconCol),
+              title: Text(_drawerLabel('language', settingsProvider.langCode)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen(initialSection: 'language')));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.headset_mic_outlined, color: iconCol),
+              title: Text(_drawerLabel('help', settingsProvider.langCode)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen(initialSection: 'help')));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.info_outline, color: iconCol),
+              title: Text(_drawerLabel('about', settingsProvider.langCode)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen(initialSection: 'about')));
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.orange),
+              title: Text(_drawerLabel('logout', settingsProvider.langCode), style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen(initialSection: 'logout')));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete_outline, color: Colors.red),
+              title: Text(_drawerLabel('delete', settingsProvider.langCode), style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen(initialSection: 'delete')));
+              },
+            ),
+          ],
+        ),
+      ),
       body: pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
@@ -258,6 +401,7 @@ class _HomeDashboardState extends State<_HomeDashboard> {
 
     final hasOngoingQuiz = quizProvider.currentSubject != null && !quizProvider.isQuizCompleted;
     final subjects = subjectProvider.subjects;
+    final highestScores = quizProvider.highestScores;
 
     // Dark mode colors
     final cardBg = isDark ? const Color(0xFF1E1E1E) : Colors.white;
@@ -278,111 +422,7 @@ class _HomeDashboardState extends State<_HomeDashboard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1. Header Section (Title, ENG language button, User Profile icon)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      Icon(Icons.menu_rounded, color: textPrimary, size: 28),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          _t('heading'),
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: textPrimary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Row(
-                  children: [
-                    // Language picker (ENG button)
-                    PopupMenuButton<String>(
-                      onSelected: onLanguageChanged,
-                      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                        const PopupMenuItem<String>(
-                          value: 'si',
-                          child: Text('සිංහල (Sinhala)'),
-                        ),
-                        const PopupMenuItem<String>(
-                          value: 'en',
-                          child: Text('English'),
-                        ),
-                        const PopupMenuItem<String>(
-                          value: 'ta',
-                          child: Text('Tamil (sri lanka)'),
-                        ),
-                      ],
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.05),
-                              blurRadius: 4,
-                            )
-                          ],
-                          border: Border.all(color: const Color(0xFF1E3C72).withValues(alpha: 0.2)),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              langCode == 'en'
-                                  ? 'ENG'
-                                  : langCode == 'si'
-                                      ? 'සිංහල'
-                                      : 'தமிழ்',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF1E3C72),
-                                fontSize: 13,
-                              ),
-                            ),
-                            const Icon(Icons.arrow_drop_down, color: Color(0xFF1E3C72), size: 18),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    // User icon
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const ProfileScreen(isEmbedded: false),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1E3C72).withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.person_outline_rounded,
-                          color: Color(0xFF1E3C72),
-                          size: 24,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
+            const SizedBox(height: 8),
 
             // 2. Ongoing Quiz / "Are you ready to quiz?" Section
             GestureDetector(
@@ -565,6 +605,11 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                   }
 
                   final subject = displayedContinue[index];
+                  final highestResult = highestScores[subject.id];
+                  final double calculatedRate = highestResult != null
+                      ? (highestResult.score / (highestResult.totalQuestions == 0 ? 1 : highestResult.totalQuestions)).clamp(0.0, 1.0)
+                      : 0.0;
+
                   return Container(
                     width: 140,
                     margin: const EdgeInsets.only(right: 12, bottom: 8),
@@ -656,7 +701,7 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                                         ClipRRect(
                                           borderRadius: BorderRadius.circular(4),
                                           child: LinearProgressIndicator(
-                                            value: subject.completedRate,
+                                            value: calculatedRate,
                                             minHeight: 5,
                                             backgroundColor: Colors.grey.shade200,
                                             color: const Color(0xFF27AE60),
@@ -664,7 +709,7 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                                         ),
                                         const SizedBox(height: 2),
                                         Text(
-                                          '${(subject.completedRate * 100).toStringAsFixed(0)}% ${_t('complete')}',
+                                          '${(calculatedRate * 100).toStringAsFixed(0)}% ${_t('complete')}',
                                           style: const TextStyle(
                                             fontSize: 9,
                                             color: Colors.grey,

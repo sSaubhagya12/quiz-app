@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../logic/providers/auth_provider.dart';
 import '../../logic/providers/theme_provider.dart';
@@ -127,61 +130,173 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return translations[_langCode]?[key] ?? key;
   }
 
-  void _showPhotoOptionsDialog(BuildContext context, AuthProvider authProvider, StudentModel? student) {
-    showModalBottomSheet(
+  /// Picks an image from [source] (camera or gallery), converts it to
+  /// Base64 and stores directly in Firestore — no Firebase Storage needed.
+  Future<void> _pickAndUploadPhoto(
+    BuildContext context,
+    AuthProvider authProvider,
+    StudentModel? student,
+    ImageSource source,
+  ) async {
+    try {
+      final picker = ImagePicker();
+      final XFile? pickedFile = await picker.pickImage(
+        source: source,
+        imageQuality: 60,   // quality අඩු කළොත් file size අඩු වේ
+        maxWidth: 600,       // max width 600px — Firestore limit සඳහා
+      );
+
+      if (pickedFile == null) return; // User cancelled
+      if (!context.mounted) return;
+
+      // Show processing indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const Center(
+          child: Card(
+            child: Padding(
+              padding: EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Processing...'),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Read image bytes & convert to Base64
+      final bytes = await pickedFile.readAsBytes();
+      final base64String = 'data:image/jpeg;base64,${base64Encode(bytes)}';
+
+      if (!context.mounted) return;
+      Navigator.pop(context); // close progress dialog
+
+      await authProvider.updateProfile(
+        name: student?.name ?? '',
+        school: student?.school ?? '',
+        grade: student?.grade ?? '',
+        oLevelYear: student?.oLevelYear ?? 2026,
+        phone: student?.phone ?? '',
+        photoUrl: base64String,
+      );
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Profile photo updated successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        try { Navigator.of(context, rootNavigator: true).pop(); } catch (_) {}
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to process photo: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  /// Decodes a Base64 or network image into an ImageProvider
+  ImageProvider? _resolveImageProvider(String photoUrl) {
+    if (photoUrl.isEmpty) return null;
+    if (photoUrl.startsWith('data:image')) {
+      try {
+        final base64Data = photoUrl.split(',').last;
+        return MemoryImage(base64Decode(base64Data));
+      } catch (_) {
+        return null;
+      }
+    }
+    return NetworkImage(photoUrl);
+  }
+
+  /// Small circular avatar for header top-right
+  Widget _buildMiniAvatar(StudentModel? student, {double size = 28}) {
+    final photoUrl = student?.photoUrl ?? '';
+    final provider = _resolveImageProvider(photoUrl);
+    final initial = student?.name.isNotEmpty == true ? student!.name[0].toUpperCase() : 'S';
+    return CircleAvatar(
+      radius: size / 2,
+      backgroundColor: Colors.white24,
+      backgroundImage: provider,
+      child: provider == null
+          ? Text(initial, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold))
+          : null,
+    );
+  }
+
+  /// Large circular avatar for profile center
+  Widget _buildMainAvatar(StudentModel? student, bool isDark, Color textColor) {
+    final photoUrl = student?.photoUrl ?? '';
+    final provider = _resolveImageProvider(photoUrl);
+    final initial = student?.name.isNotEmpty == true ? student!.name[0].toUpperCase() : 'S';
+    return CircleAvatar(
+      radius: 54,
+      backgroundColor: isDark ? const Color(0xFF2C2C2C) : Colors.grey.shade200,
+      backgroundImage: provider,
+      child: provider == null
+          ? Text(initial, style: TextStyle(color: textColor, fontSize: 48, fontWeight: FontWeight.bold))
+          : null,
+    );
+  }
+
+  /// View Photo dialog — supports base64 data URIs and network URLs
+  void _showViewPhotoDialogBase64(BuildContext context, String photoUrl) {
+    final provider = _resolveImageProvider(photoUrl);
+    if (provider == null) return;
+
+    showDialog(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
       builder: (context) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+        return Dialog(
+          backgroundColor: Colors.black87,
+          insetPadding: const EdgeInsets.all(16),
+          child: Stack(
+            alignment: Alignment.topRight,
             children: [
-              ListTile(
-                leading: const Icon(Icons.photo_camera, color: Color(0xFF1E3C72)),
-                title: Text(_t('take_photo')),
-                onTap: () {
-                  Navigator.pop(context);
-                  _showPresetAvatarsDialog(context, authProvider);
-                },
+              Center(
+                child: InteractiveViewer(
+                  minScale: 0.5,
+                  maxScale: 4.0,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image(
+                      image: provider,
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) => const Icon(
+                        Icons.broken_image,
+                        color: Colors.white54,
+                        size: 80,
+                      ),
+                    ),
+                  ),
+                ),
               ),
-              ListTile(
-                leading: const Icon(Icons.photo_library, color: Color(0xFF1E3C72)),
-                title: Text(_t('choose_photo')),
-                onTap: () {
-                  Navigator.pop(context);
-                  _showPresetAvatarsDialog(context, authProvider);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.delete, color: Colors.red),
-                title: Text(_t('delete_photo')),
-                onTap: () async {
-                  Navigator.pop(context);
-                  await authProvider.updateProfile(
-                    name: student?.name ?? '',
-                    school: student?.school ?? '',
-                    grade: student?.grade ?? '',
-                    oLevelYear: student?.oLevelYear ?? 2026,
-                    phone: student?.phone ?? '',
-                    photoUrl: '', // remove photo
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.visibility, color: Colors.grey),
-                title: Text(_t('view_photo')),
-                onTap: () {
-                  Navigator.pop(context);
-                  if (student?.photoUrl.isNotEmpty == true) {
-                    _showViewPhotoDialog(context, student!.photoUrl);
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('No photo to view')),
-                    );
-                  }
-                },
+              Positioned(
+                top: 8,
+                right: 8,
+                child: GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: const BoxDecoration(
+                      color: Colors.black54,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.close, color: Colors.white, size: 22),
+                  ),
+                ),
               ),
             ],
           ),
@@ -190,118 +305,83 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _showPresetAvatarsDialog(BuildContext context, AuthProvider authProvider) {
-    final student = authProvider.currentStudent;
-    final customUrlController = TextEditingController();
-
-    final presets = [
-      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80',
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80',
-      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80',
-      'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&q=80',
-      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&q=80',
-      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&q=80',
-    ];
-
-    showDialog(
+  void _showPhotoOptionsDialog(BuildContext context, AuthProvider authProvider, StudentModel? student) {
+    showModalBottomSheet(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(_t('select_avatar')),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: double.maxFinite,
-                  height: 160,
-                  child: GridView.builder(
-                    itemCount: presets.length,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                    ),
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () async {
-                          Navigator.pop(context);
-                          await authProvider.updateProfile(
-                            name: student?.name ?? '',
-                            school: student?.school ?? '',
-                            grade: student?.grade ?? '',
-                            oLevelYear: student?.oLevelYear ?? 2026,
-                            phone: student?.phone ?? '',
-                            photoUrl: presets[index],
-                          );
-                        },
-                        child: CircleAvatar(
-                          backgroundImage: NetworkImage(presets[index]),
-                        ),
-                      );
-                    },
-                  ),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle bar
+              Container(
+                margin: const EdgeInsets.only(top: 10, bottom: 4),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
                 ),
-                const SizedBox(height: 12),
-                Text(_t('enter_url'), style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                const SizedBox(height: 6),
-                TextField(
-                  controller: customUrlController,
-                  decoration: InputDecoration(
-                    hintText: 'https://example.com/avatar.jpg',
-                    labelText: _t('custom_url'),
-                    border: const OutlineInputBorder(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(_t('cancel')),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                if (customUrlController.text.trim().isNotEmpty) {
-                  Navigator.pop(context);
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_camera, color: Color(0xFF1E3C72)),
+                title: Text(_t('take_photo')),
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  await _pickAndUploadPhoto(
+                    context, authProvider, student, ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library, color: Color(0xFF1E3C72)),
+                title: Text(_t('choose_photo')),
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  await _pickAndUploadPhoto(
+                    context, authProvider, student, ImageSource.gallery);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete, color: Colors.red),
+                title: Text(_t('delete_photo')),
+                onTap: () async {
+                  Navigator.pop(ctx);
                   await authProvider.updateProfile(
                     name: student?.name ?? '',
                     school: student?.school ?? '',
                     grade: student?.grade ?? '',
                     oLevelYear: student?.oLevelYear ?? 2026,
                     phone: student?.phone ?? '',
-                    photoUrl: customUrlController.text.trim(),
+                    photoUrl: '',
                   );
-                }
-              },
-              child: Text(_t('update')),
-            ),
-          ],
-         );
-       },
-     );
-  }
-
-  void _showViewPhotoDialog(BuildContext context, String url) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: Stack(
-            alignment: Alignment.topRight,
-            children: [
-              InteractiveViewer(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.network(url, fit: BoxFit.contain),
-                ),
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Profile photo deleted.'),
+                        backgroundColor: Colors.orange,
+                      ),
+                    );
+                  }
+                },
               ),
-              IconButton(
-                icon: const Icon(Icons.close, color: Colors.white, size: 30),
-                onPressed: () => Navigator.pop(context),
+              ListTile(
+                leading: const Icon(Icons.visibility, color: Colors.grey),
+                title: Text(_t('view_photo')),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  if (student?.photoUrl.isNotEmpty == true) {
+                    _showViewPhotoDialogBase64(context, student!.photoUrl);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('No photo to view')),
+                    );
+                  }
+                },
               ),
+              const SizedBox(height: 8),
             ],
           ),
         );
@@ -422,40 +502,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   const Spacer(),
-                  // ENG Dropdown (Sinhala/Tamil support)
-                  PopupMenuButton<String>(
-                    onSelected: (lang) {
-                      setState(() {
-                        _langCode = lang;
-                      });
-                      if (widget.onLanguageChanged != null) {
-                        widget.onLanguageChanged!(lang);
-                      }
-                    },
-                    itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                      const PopupMenuItem<String>(value: 'si', child: Text('සිංහල')),
-                      const PopupMenuItem<String>(value: 'en', child: Text('English')),
-                      const PopupMenuItem<String>(value: 'ta', child: Text('Tamil (sri lanka)')),
-                    ],
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            _langCode == 'en' ? 'ENG' : _langCode == 'si' ? 'සිංහල' : 'தமிழ்',
-                            style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-                          ),
-                          const Icon(Icons.arrow_drop_down, color: Colors.white, size: 16),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
                   // Dark Mode Text + Toggle Switch
                   Row(
                     mainAxisSize: MainAxisSize.min,
@@ -488,19 +534,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(width: 4),
                   // Top-Right profile icon
-                  CircleAvatar(
-                    radius: 14,
-                    backgroundColor: Colors.white24,
-                    backgroundImage: student?.photoUrl.isNotEmpty == true
-                        ? NetworkImage(student!.photoUrl)
-                        : null,
-                    child: student?.photoUrl.isNotEmpty != true
-                        ? Text(
-                            student?.name.isNotEmpty == true ? student!.name[0].toUpperCase() : 'S',
-                            style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
-                          )
-                        : null,
-                  ),
+                  _buildMiniAvatar(student, size: 28),
                 ],
               ),
             ),
@@ -530,19 +564,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             )
                           ],
                         ),
-                        child: CircleAvatar(
-                          radius: 54,
-                          backgroundColor: isDark ? const Color(0xFF2C2C2C) : Colors.grey.shade200,
-                          backgroundImage: student?.photoUrl.isNotEmpty == true
-                              ? NetworkImage(student!.photoUrl)
-                              : null,
-                          child: student?.photoUrl.isNotEmpty != true
-                              ? Text(
-                                  student?.name.isNotEmpty == true ? student!.name[0].toUpperCase() : 'S',
-                                  style: TextStyle(color: textPrimaryColor, fontSize: 48, fontWeight: FontWeight.bold),
-                                )
-                              : null,
-                        ),
+                        child: _buildMainAvatar(student, isDark, textPrimaryColor),
                       ),
                       Positioned(
                         bottom: 0,
@@ -808,6 +830,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (!widget.isEmbedded) {
       return Scaffold(
         backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF4F6FC),
+        appBar: AppBar(
+          title: Text(_t('profile'), style: const TextStyle(fontWeight: FontWeight.bold)),
+          backgroundColor: isDark ? const Color(0xFF1E1E1E) : const Color(0xFF1E3C72),
+          foregroundColor: Colors.white,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
         body: bodyContent,
       );
     }

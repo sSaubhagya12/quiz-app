@@ -5,6 +5,7 @@ import 'firebase_options.dart';
 import 'logic/providers/auth_provider.dart';
 import 'logic/providers/subject_provider.dart';
 import 'logic/providers/quiz_provider.dart';
+import 'logic/providers/settings_provider.dart';
 import 'logic/providers/theme_provider.dart';
 import 'ui/screens/login_screen.dart';
 import 'ui/screens/signup_screen.dart';
@@ -25,6 +26,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => SubjectProvider()),
         ChangeNotifierProvider(create: (_) => QuizProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => SettingsProvider()),
       ],
       child: const EduQuizApp(),
     ),

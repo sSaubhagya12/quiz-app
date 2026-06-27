@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../logic/providers/quiz_provider.dart';
+import '../../logic/providers/subject_provider.dart';
 import '../../data/models/quiz_result_model.dart';
 import '../widgets/emoji_rain.dart';
 
@@ -40,39 +41,39 @@ class _ResultsScreenState extends State<ResultsScreen>
   // ==========================================
   _ScoreConfig _getConfig(double pct) {
     if (pct < 40) {
-      return _ScoreConfig(
+      return const _ScoreConfig(
         label: 'නැවතත් උත්සාහ කරන්න! 😢',
         subLabel: 'ඔබට තව ඉගෙනීමට ඕනෑ',
-        emojis: const ['😢', '😔', '💔', '😞'],
-        topColor1: const Color(0xFFEB5757),
-        topColor2: const Color(0xFFFF8C8C),
+        emojis: ['😢', '😔', '💔', '😞'],
+        topColor1: Color(0xFFEB5757),
+        topColor2: Color(0xFFFF8C8C),
         icon: Icons.refresh_rounded,
       );
     } else if (pct < 60) {
-      return _ScoreConfig(
+      return const _ScoreConfig(
         label: 'හොඳයි! නැවත උත්සාහ කරන්න 💪',
         subLabel: 'ඔබ ඉදිරියට යනවා!',
-        emojis: const ['💪', '😐', '📖', '🌱'],
-        topColor1: const Color(0xFFf7971e),
-        topColor2: const Color(0xFFffd200),
+        emojis: ['💪', '😐', '📖', '🌱'],
+        topColor1: Color(0xFFf7971e),
+        topColor2: Color(0xFFffd200),
         icon: Icons.trending_up_rounded,
       );
     } else if (pct < 80) {
-      return _ScoreConfig(
+      return const _ScoreConfig(
         label: 'හොඳ ලකුණු! 👍',
         subLabel: 'ඔබ ඉතා ඉදිරියෙහි!',
-        emojis: const ['👍', '😊', '⭐', '🌟'],
-        topColor1: const Color(0xFF2D9CDB),
-        topColor2: const Color(0xFF56CCF2),
+        emojis: ['👍', '😊', '⭐', '🌟'],
+        topColor1: Color(0xFF2D9CDB),
+        topColor2: Color(0xFF56CCF2),
         icon: Icons.thumb_up_rounded,
       );
     } else {
-      return _ScoreConfig(
+      return const _ScoreConfig(
         label: 'ඉතාමත් හොඳයි! 🎉',
         subLabel: 'ඔබ ඉතා දක්ෂයි!',
-        emojis: const ['🎉', '🏆', '🌟', '✨', '🎊'],
-        topColor1: const Color(0xFF27AE60),
-        topColor2: const Color(0xFF2ECC71),
+        emojis: ['🎉', '🏆', '🌟', '✨', '🎊'],
+        topColor1: Color(0xFF27AE60),
+        topColor2: Color(0xFF2ECC71),
         icon: Icons.emoji_events_rounded,
       );
     }
@@ -81,8 +82,10 @@ class _ResultsScreenState extends State<ResultsScreen>
   @override
   Widget build(BuildContext context) {
     final quizProvider = context.watch<QuizProvider>();
+    final subjectProvider = context.read<SubjectProvider>();
     final result = quizProvider.lastQuizResult;
     final hasRecentResult = result != null;
+    final validSubjectIds = subjectProvider.subjects.map((s) => s.id).toSet();
     
     final displayResult = result ??
         QuizResultModel(
@@ -356,7 +359,9 @@ class _ResultsScreenState extends State<ResultsScreen>
                         color: Color(0xFF1E3C72)),
                   ),
                   const SizedBox(height: 8),
-                  ...quizProvider.highestScores.entries.map((entry) {
+                  ...quizProvider.highestScores.entries
+                      .where((entry) => validSubjectIds.contains(entry.key))
+                      .map((entry) {
                     final r = entry.value;
                     final pct = (r.score / r.totalQuestions) * 100;
                     final isCurrentSubject = hasRecentResult && r.subjectId == displayResult.subjectId;

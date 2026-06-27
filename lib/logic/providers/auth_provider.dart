@@ -160,6 +160,22 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ගිණුම මකා දැමීම (Delete Account)
+  Future<void> deleteAccount(String email, String password) async {
+    _setLoading(true);
+    _clearError();
+    try {
+      await _firebaseService.deleteStudentAccount(email, password);
+      _currentStudent = null;
+      _setLoading(false);
+      notifyListeners();
+    } catch (e) {
+      _setError(e.toString().replaceAll("Exception: ", ""));
+      _setLoading(false);
+      rethrow;
+    }
+  }
+
   // Loading තත්ත්වය වෙනස් කිරීම
   void _setLoading(bool value) {
     _isLoading = value;

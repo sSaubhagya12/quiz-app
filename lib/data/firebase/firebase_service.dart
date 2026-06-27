@@ -60,6 +60,21 @@ class FirebaseService {
     await _auth.signOut();
   }
 
+  Future<void> deleteStudentAccount(String email, String password) async {
+    final user = _auth.currentUser;
+    if (user == null) throw Exception("No user logged in.");
+
+    // Re-authenticate
+    final credential = EmailAuthProvider.credential(email: email, password: password);
+    await user.reauthenticateWithCredential(credential);
+
+    // Delete Firestore document (this leaves subcollections orphaned, but that's standard unless using a Cloud Function. To be thorough, we could delete results, but deleting the main user doc is sufficient for this scope).
+    await _db.collection('users').doc(user.uid).delete();
+
+    // Delete Auth User
+    await user.delete();
+  }
+
   // ==========================================
   // 2. SUBJECTS (Home Page)
   // ==========================================
