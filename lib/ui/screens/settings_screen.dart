@@ -15,7 +15,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-
   // ===================== Translations =====================
   static const _labels = {
     'en': {
@@ -37,7 +36,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       'logout_confirm': 'Are you sure you want to log out?',
       'delete_warning':
           'Warning: This action is permanent and will delete all your scores and progress. '
-          'To verify it\'s you, please enter your email and password.',
+              'To verify it\'s you, please enter your email and password.',
       'email': 'Email',
       'password': 'Password',
       'delete_permanently': 'Delete Permanently',
@@ -61,7 +60,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       'logout_confirm': 'ඔබ ඉවත් වීමට අදහස් කරනවාද?',
       'delete_warning':
           'අවවාදය: මෙය සදහටම ඔබගේ සියලුම ලකුණු සහ ප්‍රගතිය මකා දමයි. '
-          'ඔබ බව තහවුරු කිරීමට ඊමේල් සහ මුරපදය ඇතුළු කරන්න.',
+              'ඔබ බව තහවුරු කිරීමට ඊමේල් සහ මුරපදය ඇතුළු කරන්න.',
       'email': 'ඊමේල්',
       'password': 'මුරපදය',
       'delete_permanently': 'සදහටම මකන්න',
@@ -85,7 +84,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       'logout_confirm': 'நீங்கள் வெளியேற விரும்புகிறீர்களா?',
       'delete_warning':
           'எச்சரிக்கை: இந்த செயல் நிரந்தரமானது மற்றும் உங்கள் அனைத்து மதிப்பெண்களையும் நீக்கும். '
-          'உங்களை சரிபார்க்க மின்னஞ்சல் மற்றும் கடவுச்சொல் உள்ளிடுக.',
+              'உங்களை சரிபார்க்க மின்னஞ்சல் மற்றும் கடவுச்சொல் உள்ளிடுக.',
       'email': 'மின்னஞ்சல்',
       'password': 'கடவுச்சொல்',
       'delete_permanently': 'நிரந்தரமாக நீக்கு',
@@ -149,6 +148,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             settings.setLanguage(code);
             Navigator.pop(ctx);
           }
+
           return AlertDialog(
             title: Text(_t('language', settings.langCode)),
             content: Column(
@@ -205,13 +205,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Row(children: [
               Icon(Icons.email_outlined, size: 18, color: Color(0xFF1E3C72)),
               SizedBox(width: 8),
-              Flexible(child: SelectableText('sathsaranisaubhagya2025@gmail.com', style: TextStyle(fontWeight: FontWeight.bold))),
+              Flexible(
+                  child: SelectableText('sathsaranisaubhagya2025@gmail.com',
+                      style: TextStyle(fontWeight: FontWeight.bold))),
             ]),
             SizedBox(height: 8),
             Row(children: [
               Icon(Icons.phone_outlined, size: 18, color: Color(0xFF1E3C72)),
               SizedBox(width: 8),
-              SelectableText('+94740910955', style: TextStyle(fontWeight: FontWeight.bold)),
+              SelectableText('+94740910955',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
             ]),
             SizedBox(height: 12),
             Text('We are here to help you succeed in your O-Levels! 🎓'),
@@ -237,22 +240,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
       barrierDismissible: false,
       builder: (ctx) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: Text(_t('delete', lang), style: const TextStyle(color: Colors.red)),
+          title: Text(_t('delete', lang),
+              style: const TextStyle(color: Colors.red)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(_t('delete_warning', lang), style: const TextStyle(fontSize: 13)),
+              Text(_t('delete_warning', lang),
+                  style: const TextStyle(fontSize: 13)),
               const SizedBox(height: 16),
               TextField(
                 controller: emailCtrl,
-                decoration: InputDecoration(labelText: _t('email', lang), border: const OutlineInputBorder()),
+                decoration: InputDecoration(
+                    labelText: _t('email', lang),
+                    border: const OutlineInputBorder()),
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: passCtrl,
-                decoration: InputDecoration(labelText: _t('password', lang), border: const OutlineInputBorder()),
+                decoration: InputDecoration(
+                    labelText: _t('password', lang),
+                    border: const OutlineInputBorder()),
                 obscureText: true,
               ),
               if (isDeleting) ...[
@@ -269,14 +278,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             if (!isDeleting)
               ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red, foregroundColor: Colors.white),
                 onPressed: () async {
                   if (emailCtrl.text.isEmpty || passCtrl.text.isEmpty) return;
                   setState(() => isDeleting = true);
                   final messenger = ScaffoldMessenger.of(context);
                   final navigator = Navigator.of(context);
                   try {
-                    await context.read<AuthProvider>().deleteAccount(emailCtrl.text.trim(), passCtrl.text);
+                    await context
+                        .read<AuthProvider>()
+                        .deleteAccount(emailCtrl.text.trim(), passCtrl.text);
                     navigator.pop();
                     navigator.pushAndRemoveUntil(
                       MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -285,7 +297,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   } catch (e) {
                     setState(() => isDeleting = false);
                     messenger.showSnackBar(
-                      SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: Colors.red),
+                      SnackBar(
+                          content: Text('Error: ${e.toString()}'),
+                          backgroundColor: Colors.red),
                     );
                   }
                 },
@@ -320,7 +334,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 );
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red, foregroundColor: Colors.white),
             child: Text(_t('logout', lang)),
           ),
         ],
@@ -342,17 +357,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _triggerInitial() {
     final lang = context.read<SettingsProvider>().langCode;
     switch (widget.initialSection) {
-      case 'notification': _showNotificationSettings(context, lang); break;
-      case 'language':     _showLanguageSettings(context); break;
-      case 'help':         _showHelpSupport(context, lang); break;
-      case 'logout':       _showLogoutDialog(context, lang); break;
-      case 'delete':       _showDeleteAccountDialog(context, lang); break;
+      case 'notification':
+        _showNotificationSettings(context, lang);
+        break;
+      case 'language':
+        _showLanguageSettings(context);
+        break;
+      case 'help':
+        _showHelpSupport(context, lang);
+        break;
+      case 'logout':
+        _showLogoutDialog(context, lang);
+        break;
+      case 'delete':
+        _showDeleteAccountDialog(context, lang);
+        break;
       case 'about':
         showAboutDialog(
           context: context,
           applicationName: 'EduQuiz O-Level',
           applicationVersion: '1.0.0',
-          applicationIcon: const Icon(Icons.school, size: 50, color: Color(0xFF1E3C72)),
+          applicationIcon:
+              const Icon(Icons.school, size: 50, color: Color(0xFF1E3C72)),
           applicationLegalese: '© 2026 EduQuiz. All rights reserved.',
         );
         break;
@@ -367,7 +393,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_t('settings', lang), style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(_t('settings', lang),
+            style: const TextStyle(fontWeight: FontWeight.bold)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -382,7 +409,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const ProfileScreen(isEmbedded: false)),
+                MaterialPageRoute(
+                    builder: (_) => const ProfileScreen(isEmbedded: false)),
               );
             },
           ),
@@ -418,7 +446,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 context: context,
                 applicationName: 'EduQuiz O-Level',
                 applicationVersion: '1.0.0',
-                applicationIcon: const Icon(Icons.school, size: 50, color: Color(0xFF1E3C72)),
+                applicationIcon: const Icon(Icons.school,
+                    size: 50, color: Color(0xFF1E3C72)),
                 applicationLegalese: '© 2026 EduQuiz. All rights reserved.',
               );
             },
@@ -469,12 +498,14 @@ class _SettingsItem extends StatelessWidget {
         side: BorderSide(color: Colors.grey.withValues(alpha: 0.2)),
       ),
       child: ListTile(
-        leading: Icon(icon, color: iconColor ?? Theme.of(context).colorScheme.primary),
+        leading: Icon(icon,
+            color: iconColor ?? Theme.of(context).colorScheme.primary),
         title: Text(
           title,
           style: TextStyle(fontWeight: FontWeight.w600, color: titleColor),
         ),
-        trailing: trailing ?? const Icon(Icons.chevron_right, color: Colors.grey),
+        trailing:
+            trailing ?? const Icon(Icons.chevron_right, color: Colors.grey),
         onTap: onTap,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
