@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../logic/providers/auth_provider.dart';
@@ -57,6 +58,35 @@ class _HomeScreenState extends State<HomeScreen> {
     return labels[lang]?[key] ?? labels['en']![key]!;
   }
 
+  /// Decodes a Base64 or network image into an ImageProvider
+  ImageProvider? _resolveImageProvider(String photoUrl) {
+    if (photoUrl.isEmpty) return null;
+    if (photoUrl.startsWith('data:image')) {
+      try {
+        final base64Data = photoUrl.split(',').last;
+        return MemoryImage(base64Decode(base64Data));
+      } catch (_) {
+        return null;
+      }
+    }
+    return NetworkImage(photoUrl);
+  }
+
+  /// Small circular avatar for header top-right
+  Widget _buildMiniAvatar(dynamic student, {double size = 32}) {
+    final photoUrl = student?.photoUrl ?? '';
+    final provider = _resolveImageProvider(photoUrl);
+    final initial = student?.name?.isNotEmpty == true ? student!.name[0].toUpperCase() : 'S';
+    return CircleAvatar(
+      radius: size / 2,
+      backgroundColor: Colors.white24,
+      backgroundImage: provider,
+      child: provider == null
+          ? Text(initial, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold))
+          : null,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
@@ -94,26 +124,55 @@ class _HomeScreenState extends State<HomeScreen> {
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
-          // Language picker in AppBar
-          PopupMenuButton<String>(
-            onSelected: (code) => settingsProvider.setLanguage(code),
-            icon: const Icon(Icons.language, color: Colors.white),
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 'en', child: Text('English')),
-              PopupMenuItem(value: 'si', child: Text('සිංහල')),
-              PopupMenuItem(value: 'ta', child: Text('தமிழ்')),
-            ],
-          ),
-          // User profile icon in AppBar
+          if (_selectedIndex == 2)
+            // Dark Mode Switch for Profile page
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  isDark ? Icons.dark_mode : Icons.dark_mode_outlined,
+                  color: Colors.white,
+                  size: 15,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  _drawerLabel('darkmode', settingsProvider.langCode),
+                  style: const TextStyle(color: Colors.white, fontSize: 11),
+                ),
+                Transform.scale(
+                  scale: 0.7,
+                  child: Switch(
+                    value: isDark,
+                    onChanged: (_) => themeProvider.toggleTheme(),
+                    activeThumbColor: Colors.amber,
+                    activeTrackColor: Colors.amber.withValues(alpha: 0.3),
+                    inactiveThumbColor: Colors.white70,
+                    inactiveTrackColor: Colors.white24,
+                  ),
+                ),
+              ],
+            ),
+          if (_selectedIndex != 2)
+            // Language Picker for Home & Subject
+            PopupMenuButton<String>(
+              onSelected: (code) => settingsProvider.setLanguage(code),
+              icon: const Icon(Icons.language, color: Colors.white),
+              itemBuilder: (_) => const [
+                PopupMenuItem(value: 'si', child: Text('සිංහල (Sinhala)')),
+                PopupMenuItem(value: 'en', child: Text('English')),
+                PopupMenuItem(value: 'ta', child: Text('தமிழ் (Tamil)')),
+              ],
+            ),
+          // Profile Icon (always visible, switches to Profile tab)
           IconButton(
             icon: const Icon(Icons.person_outline_rounded, color: Colors.white),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ProfileScreen(isEmbedded: false)),
-              );
+              if (_selectedIndex != 2) {
+                setState(() => _selectedIndex = 2);
+              }
             },
           ),
+          const SizedBox(width: 8),
         ],
       ),
       drawer: Drawer(
@@ -129,7 +188,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const Icon(Icons.school, size: 50, color: Colors.white),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Icon(Icons.school, size: 50, color: Colors.white),
+                      _buildMiniAvatar(student),
+                    ],
+                  ),
                   const SizedBox(height: 8),
                   const Text('EduQuiz O-Level', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 4),
@@ -150,7 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
               title: Text(_drawerLabel('notifications', settingsProvider.langCode)),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen(initialSection: 'notification')));
+                SettingsScreen.showNotificationSettings(context, settingsProvider.langCode);
               },
             ),
             ListTile(
@@ -167,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
               title: Text(_drawerLabel('language', settingsProvider.langCode)),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen(initialSection: 'language')));
+                SettingsScreen.showLanguageSettings(context);
               },
             ),
             ListTile(
@@ -175,7 +241,7 @@ class _HomeScreenState extends State<HomeScreen> {
               title: Text(_drawerLabel('help', settingsProvider.langCode)),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen(initialSection: 'help')));
+                SettingsScreen.showHelpSupport(context, settingsProvider.langCode);
               },
             ),
             ListTile(
@@ -183,7 +249,13 @@ class _HomeScreenState extends State<HomeScreen> {
               title: Text(_drawerLabel('about', settingsProvider.langCode)),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen(initialSection: 'about')));
+                showAboutDialog(
+                  context: context,
+                  applicationName: 'EduQuiz O-Level',
+                  applicationVersion: '1.0.0',
+                  applicationIcon: const Icon(Icons.school, size: 50, color: Color(0xFF1E3C72)),
+                  applicationLegalese: '© 2026 EduQuiz. All rights reserved.',
+                );
               },
             ),
             const Divider(),
@@ -192,7 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
               title: Text(_drawerLabel('logout', settingsProvider.langCode), style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen(initialSection: 'logout')));
+                SettingsScreen.showLogoutDialog(context, settingsProvider.langCode);
               },
             ),
             ListTile(
@@ -200,7 +272,7 @@ class _HomeScreenState extends State<HomeScreen> {
               title: Text(_drawerLabel('delete', settingsProvider.langCode), style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen(initialSection: 'delete')));
+                SettingsScreen.showDeleteAccountDialog(context, settingsProvider.langCode);
               },
             ),
           ],

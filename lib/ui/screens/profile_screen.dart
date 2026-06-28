@@ -221,21 +221,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return NetworkImage(photoUrl);
   }
 
-  /// Small circular avatar for header top-right
-  Widget _buildMiniAvatar(StudentModel? student, {double size = 28}) {
-    final photoUrl = student?.photoUrl ?? '';
-    final provider = _resolveImageProvider(photoUrl);
-    final initial = student?.name.isNotEmpty == true ? student!.name[0].toUpperCase() : 'S';
-    return CircleAvatar(
-      radius: size / 2,
-      backgroundColor: Colors.white24,
-      backgroundImage: provider,
-      child: provider == null
-          ? Text(initial, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold))
-          : null,
-    );
-  }
-
   /// Large circular avatar for profile center
   Widget _buildMainAvatar(StudentModel? student, bool isDark, Color textColor) {
     final photoUrl = student?.photoUrl ?? '';
@@ -474,71 +459,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Widget bodyContent = SingleChildScrollView(
       child: Column(
         children: [
-          // Custom Header matching wireframe
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF1E3C72), Color(0xFF2A5298)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(20),
-                bottomRight: Radius.circular(20),
-              ),
-            ),
-            child: SafeArea(
-              child: Row(
-                children: [
-                  const Icon(Icons.menu_rounded, color: Colors.white, size: 28),
-                  const SizedBox(width: 8),
-                  Text(
-                    _t('profile'),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Spacer(),
-                  // Dark Mode Text + Toggle Switch
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        isDark ? Icons.dark_mode : Icons.dark_mode_outlined,
-                        color: Colors.white,
-                        size: 15,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        _t('dark_mode'),
-                        style: const TextStyle(color: Colors.white, fontSize: 11),
-                      ),
-                      const SizedBox(width: 2),
-                      Transform.scale(
-                        scale: 0.7,
-                        child: Switch(
-                          value: isDark,
-                          onChanged: (val) {
-                            themeProvider.toggleTheme();
-                          },
-                          activeThumbColor: Colors.amber,
-                          activeTrackColor: Colors.amber.withValues(alpha: 0.3),
-                          inactiveThumbColor: Colors.white70,
-                          inactiveTrackColor: Colors.white24,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(width: 4),
-                  // Top-Right profile icon
-                  _buildMiniAvatar(student, size: 28),
-                ],
-              ),
-            ),
-          ),
+
 
           Padding(
             padding: const EdgeInsets.all(20),

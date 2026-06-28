@@ -10,13 +10,8 @@ class SettingsScreen extends StatefulWidget {
   final String? initialSection;
   const SettingsScreen({super.key, this.initialSection});
 
-  @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends State<SettingsScreen> {
   // ===================== Translations =====================
-  static const _labels = {
+  static const labels = {
     'en': {
       'settings': 'Settings',
       'account': 'Account',
@@ -91,38 +86,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
     },
   };
 
-  String _t(String key, String lang) {
-    return _labels[lang]?[key] ?? _labels['en']![key] ?? key;
+  static String t(String key, String lang) {
+    return labels[lang]?[key] ?? labels['en']![key] ?? key;
   }
 
   // ===================== Dialogs =====================
 
-  void _showNotificationSettings(BuildContext context, String lang) {
+  static void showNotificationSettings(BuildContext context, String lang) {
     showDialog(
       context: context,
       builder: (ctx) => Consumer<SettingsProvider>(
         builder: (context, settings, _) => AlertDialog(
-          title: Text(_t('notification', lang)),
+          title: Text(t('notification', lang)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               SwitchListTile(
-                title: Text(_t('general_notif', lang)),
+                title: Text(t('general_notif', lang)),
                 value: settings.generalNotifications,
                 onChanged: (val) => settings.toggleGeneralNotifications(val),
               ),
               SwitchListTile(
-                title: Text(_t('vibrate', lang)),
+                title: Text(t('vibrate', lang)),
                 value: settings.vibrate,
                 onChanged: (val) => settings.toggleVibrate(val),
               ),
               SwitchListTile(
-                title: Text(_t('silence', lang)),
+                title: Text(t('silence', lang)),
                 value: settings.silence,
                 onChanged: (val) => settings.toggleSilence(val),
               ),
               SwitchListTile(
-                title: Text(_t('hide_notif', lang)),
+                title: Text(t('hide_notif', lang)),
                 value: settings.hideNotifications,
                 onChanged: (val) => settings.toggleHideNotifications(val),
               ),
@@ -131,7 +126,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: Text(_t('close', lang)),
+              child: Text(t('close', lang)),
             )
           ],
         ),
@@ -139,7 +134,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showLanguageSettings(BuildContext context) {
+  static void showLanguageSettings(BuildContext context) {
     showDialog(
       context: context,
       builder: (ctx) => Consumer<SettingsProvider>(
@@ -150,7 +145,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           }
 
           return AlertDialog(
-            title: Text(_t('language', settings.langCode)),
+            title: Text(t('language', settings.langCode)),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -189,11 +184,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showHelpSupport(BuildContext context, String lang) {
+  static void showHelpSupport(BuildContext context, String lang) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(_t('help', lang)),
+        title: Text(t('help', lang)),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,14 +218,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(_labels['en']!['close']!),
+            child: Text(labels['en']!['close']!),
           ),
         ],
       ),
     );
   }
 
-  void _showDeleteAccountDialog(BuildContext context, String lang) {
+  static void showDeleteAccountDialog(BuildContext context, String lang) {
     final emailCtrl = TextEditingController();
     final passCtrl = TextEditingController();
     bool isDeleting = false;
@@ -240,19 +235,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
       barrierDismissible: false,
       builder: (ctx) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: Text(_t('delete', lang),
+          title: Text(t('delete', lang),
               style: const TextStyle(color: Colors.red)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(_t('delete_warning', lang),
+              Text(t('delete_warning', lang),
                   style: const TextStyle(fontSize: 13)),
               const SizedBox(height: 16),
               TextField(
                 controller: emailCtrl,
                 decoration: InputDecoration(
-                    labelText: _t('email', lang),
+                    labelText: t('email', lang),
                     border: const OutlineInputBorder()),
                 keyboardType: TextInputType.emailAddress,
               ),
@@ -260,7 +255,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               TextField(
                 controller: passCtrl,
                 decoration: InputDecoration(
-                    labelText: _t('password', lang),
+                    labelText: t('password', lang),
                     border: const OutlineInputBorder()),
                 obscureText: true,
               ),
@@ -274,7 +269,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             if (!isDeleting)
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: Text(_t('cancel', lang)),
+                child: Text(t('cancel', lang)),
               ),
             if (!isDeleting)
               ElevatedButton(
@@ -303,7 +298,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     );
                   }
                 },
-                child: Text(_t('delete_permanently', lang)),
+                child: Text(t('delete_permanently', lang)),
               ),
           ],
         ),
@@ -311,16 +306,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showLogoutDialog(BuildContext context, String lang) {
+  static void showLogoutDialog(BuildContext context, String lang) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(_t('logout', lang)),
-        content: Text(_t('logout_confirm', lang)),
+        title: Text(t('logout', lang)),
+        content: Text(t('logout_confirm', lang)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(_t('cancel', lang)),
+            child: Text(t('cancel', lang)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -336,12 +331,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
             },
             style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red, foregroundColor: Colors.white),
-            child: Text(_t('logout', lang)),
+            child: Text(t('logout', lang)),
           ),
         ],
       ),
     );
   }
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+
 
   // ===================== Build =====================
 
@@ -358,19 +360,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final lang = context.read<SettingsProvider>().langCode;
     switch (widget.initialSection) {
       case 'notification':
-        _showNotificationSettings(context, lang);
+        SettingsScreen.showNotificationSettings(context, lang);
         break;
       case 'language':
-        _showLanguageSettings(context);
+        SettingsScreen.showLanguageSettings(context);
         break;
       case 'help':
-        _showHelpSupport(context, lang);
+        SettingsScreen.showHelpSupport(context, lang);
         break;
       case 'logout':
-        _showLogoutDialog(context, lang);
+        SettingsScreen.showLogoutDialog(context, lang);
         break;
       case 'delete':
-        _showDeleteAccountDialog(context, lang);
+        SettingsScreen.showDeleteAccountDialog(context, lang);
         break;
       case 'about':
         showAboutDialog(
@@ -393,7 +395,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_t('settings', lang),
+        title: Text(SettingsScreen.t('settings', lang),
             style: const TextStyle(fontWeight: FontWeight.bold)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -405,7 +407,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         children: [
           _SettingsItem(
             icon: Icons.person_outline,
-            title: _t('account', lang),
+            title: SettingsScreen.t('account', lang),
             onTap: () {
               Navigator.push(
                 context,
@@ -416,12 +418,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           _SettingsItem(
             icon: Icons.notifications_none_outlined,
-            title: _t('notification', lang),
-            onTap: () => _showNotificationSettings(context, lang),
+            title: SettingsScreen.t('notification', lang),
+            onTap: () => SettingsScreen.showNotificationSettings(context, lang),
           ),
           _SettingsItem(
             icon: Icons.dark_mode_outlined,
-            title: _t('darkmode', lang),
+            title: SettingsScreen.t('darkmode', lang),
             trailing: Switch(
               value: themeProvider.isDarkMode,
               onChanged: (val) => themeProvider.toggleTheme(),
@@ -430,17 +432,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           _SettingsItem(
             icon: Icons.language,
-            title: _t('language', lang),
-            onTap: () => _showLanguageSettings(context),
+            title: SettingsScreen.t('language', lang),
+            onTap: () => SettingsScreen.showLanguageSettings(context),
           ),
           _SettingsItem(
             icon: Icons.headset_mic_outlined,
-            title: _t('help', lang),
-            onTap: () => _showHelpSupport(context, lang),
+            title: SettingsScreen.t('help', lang),
+            onTap: () => SettingsScreen.showHelpSupport(context, lang),
           ),
           _SettingsItem(
             icon: Icons.info_outline,
-            title: _t('about', lang),
+            title: SettingsScreen.t('about', lang),
             onTap: () {
               showAboutDialog(
                 context: context,
@@ -455,15 +457,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 20),
           _SettingsItem(
             icon: Icons.logout,
-            title: _t('logout', lang),
-            onTap: () => _showLogoutDialog(context, lang),
+            title: SettingsScreen.t('logout', lang),
+            onTap: () => SettingsScreen.showLogoutDialog(context, lang),
           ),
           _SettingsItem(
             icon: Icons.delete_outline,
-            title: _t('delete', lang),
+            title: SettingsScreen.t('delete', lang),
             titleColor: Colors.red,
             iconColor: Colors.red,
-            onTap: () => _showDeleteAccountDialog(context, lang),
+            onTap: () => SettingsScreen.showDeleteAccountDialog(context, lang),
           ),
         ],
       ),
