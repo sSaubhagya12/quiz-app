@@ -5,7 +5,6 @@ import '../../logic/providers/subject_provider.dart';
 import '../../logic/providers/theme_provider.dart';
 import '../../data/models/subject_model.dart';
 import 'quiz_screen.dart';
-import 'profile_screen.dart';
 
 // ==========================================
 // Choose Subject Screen
@@ -171,10 +170,7 @@ class _ChooseSubjectScreenState extends State<ChooseSubjectScreen> {
     super.dispose();
   }
 
-  void _onLangChanged(String code) {
-    setState(() => _langCode = code);
-    widget.onLanguageChanged?.call(code);
-  }
+
 
   // ── Helpers ──────────────────────────────────────────────────────────────────
   bool _matchesSearch(SubjectModel s) {

@@ -1,11 +1,17 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+import 'package:screenshot/screenshot.dart';
 import '../../logic/providers/auth_provider.dart';
 import '../../logic/providers/subject_provider.dart';
 import '../../logic/providers/quiz_provider.dart';
 import '../../logic/providers/theme_provider.dart';
 import '../../logic/providers/settings_provider.dart';
+import '../../data/firebase/firebase_service.dart';
+import '../../data/models/subject_model.dart';
 import 'choose_subject_screen.dart';
 import 'profile_screen.dart';
 import 'quiz_screen.dart';
@@ -29,7 +35,9 @@ class _HomeScreenState extends State<HomeScreen> {
       context.read<SubjectProvider>().loadSubjects();
       final authProvider = context.read<AuthProvider>();
       if (authProvider.currentStudent?.uid != null) {
-        context.read<QuizProvider>().loadHighestScores(authProvider.currentStudent!.uid!);
+        context
+            .read<QuizProvider>()
+            .loadHighestScores(authProvider.currentStudent!.uid!);
       }
     });
   }
@@ -37,22 +45,34 @@ class _HomeScreenState extends State<HomeScreen> {
   static String _drawerLabel(String key, String lang) {
     const labels = {
       'en': {
-        'account': 'Account', 'notifications': 'Notification',
-        'darkmode': 'Dark mode', 'language': 'Language',
-        'help': 'Help and support', 'about': 'About',
-        'logout': 'Log out', 'delete': 'Delete Account',
+        'account': 'Account',
+        'notifications': 'Notification',
+        'darkmode': 'Dark mode',
+        'language': 'Language',
+        'help': 'Help and support',
+        'about': 'About',
+        'logout': 'Log out',
+        'delete': 'Delete Account',
       },
       'si': {
-        'account': 'ගිණුම', 'notifications': 'දැනුම්දීම්',
-        'darkmode': 'දාර්ක් මෝඩ්', 'language': 'භාෂාව',
-        'help': 'උදවු සහ සහයෝගය', 'about': 'ගැන',
-        'logout': 'අවහර වීම', 'delete': 'ගිණුම මකාදැමීම',
+        'account': 'ගිණුම',
+        'notifications': 'දැනුම්දීම්',
+        'darkmode': 'දාර්ක් මෝඩ්',
+        'language': 'භාෂාව',
+        'help': 'උදවු සහ සහයෝගය',
+        'about': 'ගැන',
+        'logout': 'අවහර වීම',
+        'delete': 'ගිණුම මකාදැමීම',
       },
       'ta': {
-        'account': 'கணக்கு', 'notifications': 'அறிவிப்புகள்',
-        'darkmode': 'இருள் மோட்', 'language': 'மொழி',
-        'help': 'உதவி & ஆதரவு', 'about': 'பற்றி',
-        'logout': 'வெளியேறு', 'delete': 'கணக்கை நீக்கு',
+        'account': 'கணக்கு',
+        'notifications': 'அறிவிப்புகள்',
+        'darkmode': 'இருள் மோட்',
+        'language': 'மொழி',
+        'help': 'உதவி & ஆதரவு',
+        'about': 'பற்றி',
+        'logout': 'வெளியேறு',
+        'delete': 'கணக்கை நீக்கு',
       },
     };
     return labels[lang]?[key] ?? labels['en']![key]!;
@@ -76,13 +96,19 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildMiniAvatar(dynamic student, {double size = 32}) {
     final photoUrl = student?.photoUrl ?? '';
     final provider = _resolveImageProvider(photoUrl);
-    final initial = student?.name?.isNotEmpty == true ? student!.name[0].toUpperCase() : 'S';
+    final initial = student?.name?.isNotEmpty == true
+        ? student!.name[0].toUpperCase()
+        : 'S';
     return CircleAvatar(
       radius: size / 2,
       backgroundColor: Colors.white24,
       backgroundImage: provider,
       child: provider == null
-          ? Text(initial, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold))
+          ? Text(initial,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold))
           : null,
     );
   }
@@ -117,10 +143,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final iconCol = isDark ? Colors.white70 : const Color(0xFF1E3C72);
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF4F6FC),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF4F6FC),
       appBar: AppBar(
-        title: const Text('Quiz O-Level', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: isDark ? const Color(0xFF1E1E1E) : const Color(0xFF1E3C72),
+        title: const Text('Quiz O-Level',
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor:
+            isDark ? const Color(0xFF1E1E1E) : const Color(0xFF1E3C72),
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
@@ -182,7 +211,8 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             DrawerHeader(
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF121212) : const Color(0xFF1E3C72),
+                color:
+                    isDark ? const Color(0xFF121212) : const Color(0xFF1E3C72),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -197,9 +227,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  const Text('EduQuiz O-Level', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                  const Text('EduQuiz O-Level',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold)),
                   const SizedBox(height: 4),
-                  Text(authProvider.currentStudent?.email ?? '', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                  Text(authProvider.currentStudent?.email ?? '',
+                      style:
+                          const TextStyle(color: Colors.white70, fontSize: 12)),
                 ],
               ),
             ),
@@ -208,15 +244,21 @@ class _HomeScreenState extends State<HomeScreen> {
               title: Text(_drawerLabel('account', settingsProvider.langCode)),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileScreen(isEmbedded: false)));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) =>
+                            const ProfileScreen(isEmbedded: false)));
               },
             ),
             ListTile(
               leading: Icon(Icons.notifications_none_outlined, color: iconCol),
-              title: Text(_drawerLabel('notifications', settingsProvider.langCode)),
+              title: Text(
+                  _drawerLabel('notifications', settingsProvider.langCode)),
               onTap: () {
                 Navigator.pop(context);
-                SettingsScreen.showNotificationSettings(context, settingsProvider.langCode);
+                SettingsScreen.showNotificationSettings(
+                    context, settingsProvider.langCode);
               },
             ),
             ListTile(
@@ -241,7 +283,8 @@ class _HomeScreenState extends State<HomeScreen> {
               title: Text(_drawerLabel('help', settingsProvider.langCode)),
               onTap: () {
                 Navigator.pop(context);
-                SettingsScreen.showHelpSupport(context, settingsProvider.langCode);
+                SettingsScreen.showHelpSupport(
+                    context, settingsProvider.langCode);
               },
             ),
             ListTile(
@@ -253,7 +296,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   context: context,
                   applicationName: 'EduQuiz O-Level',
                   applicationVersion: '1.0.0',
-                  applicationIcon: const Icon(Icons.school, size: 50, color: Color(0xFF1E3C72)),
+                  applicationIcon: const Icon(Icons.school,
+                      size: 50, color: Color(0xFF1E3C72)),
                   applicationLegalese: '© 2026 EduQuiz. All rights reserved.',
                 );
               },
@@ -261,18 +305,24 @@ class _HomeScreenState extends State<HomeScreen> {
             const Divider(),
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.orange),
-              title: Text(_drawerLabel('logout', settingsProvider.langCode), style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+              title: Text(_drawerLabel('logout', settingsProvider.langCode),
+                  style: const TextStyle(
+                      color: Colors.orange, fontWeight: FontWeight.bold)),
               onTap: () {
                 Navigator.pop(context);
-                SettingsScreen.showLogoutDialog(context, settingsProvider.langCode);
+                SettingsScreen.showLogoutDialog(
+                    context, settingsProvider.langCode);
               },
             ),
             ListTile(
               leading: const Icon(Icons.delete_outline, color: Colors.red),
-              title: Text(_drawerLabel('delete', settingsProvider.langCode), style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+              title: Text(_drawerLabel('delete', settingsProvider.langCode),
+                  style: const TextStyle(
+                      color: Colors.red, fontWeight: FontWeight.bold)),
               onTap: () {
                 Navigator.pop(context);
-                SettingsScreen.showDeleteAccountDialog(context, settingsProvider.langCode);
+                SettingsScreen.showDeleteAccountDialog(
+                    context, settingsProvider.langCode);
               },
             ),
           ],
@@ -282,14 +332,18 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (i) => setState(() => _selectedIndex = i),
-        selectedItemColor: isDark ? Colors.lightBlueAccent : const Color(0xFF1E3C72),
+        selectedItemColor:
+            isDark ? Colors.lightBlueAccent : const Color(0xFF1E3C72),
         unselectedItemColor: Colors.grey,
         backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         elevation: 10,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.menu_book_rounded), label: 'Subjects'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: 'Profile'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.home_rounded), label: 'Home'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.menu_book_rounded), label: 'Subjects'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.person_rounded), label: 'Profile'),
         ],
       ),
     );
@@ -317,6 +371,414 @@ class _HomeDashboard extends StatefulWidget {
 
 class _HomeDashboardState extends State<_HomeDashboard> {
   bool _showAllContinueLearning = false;
+
+  // =============================================
+  // PDF Generation  –  සිංහල font support via Image rendering
+  // =============================================
+  Future<void> _generateAndDownloadPdf(
+      BuildContext context, SubjectModel subject, String displayName) async {
+    try {
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const Center(
+            child: Card(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(color: Color(0xFF1E3C72)),
+                    SizedBox(height: 16),
+                    Text('PDF සකස් කරමින්...\nGenerating PDF...',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      final questions =
+          await FirebaseService.instance.getQuestionsBySubject(subject.id!);
+
+      if (!context.mounted) return;
+      Navigator.pop(context); // close loading dialog
+
+      if (questions.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No questions found for this subject.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        return;
+      }
+
+      // Load English font for header only
+      final ttf = await PdfGoogleFonts.abhayaLibreRegular();
+      final ttfBold = await PdfGoogleFonts.abhayaLibreBold();
+
+      // Pre-render all questions to images using ScreenshotController
+      final sc = ScreenshotController();
+      final questionImages = <pw.Image>[];
+
+      // Re-show loading dialogue with progress context if needed, but doing it fast
+      for (int i = 0; i < questions.length; i++) {
+        final q = questions[i];
+        final optionLabels = ['A', 'B', 'C', 'D'];
+        final options = [q.option1, q.option2, q.option3, q.option4];
+
+        final widget = Directionality(
+          textDirection: TextDirection.ltr,
+          child: Material(
+            color: Colors.white,
+            child: Container(
+              width: 320,
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 20,
+                        height: 20,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF1E3C72),
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          '${i + 1}',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          q.questionText,
+                          style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  ...options.asMap().entries.map((opt) {
+                    return Padding(
+                      padding: const EdgeInsets.only(left: 28, bottom: 4),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 16,
+                            height: 16,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              optionLabels[opt.key],
+                              style: TextStyle(
+                                  color: Colors.grey.shade700,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              opt.value,
+                              style: const TextStyle(
+                                  fontSize: 11, color: Colors.black),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  const SizedBox(height: 4),
+                  const Divider(color: Colors.grey, thickness: 0.5, height: 1),
+                ],
+              ),
+            ),
+          ),
+        );
+
+        final imageBytes = await sc.captureFromWidget(widget, delay: Duration.zero);
+        questionImages.add(pw.Image(pw.MemoryImage(imageBytes)));
+      }
+
+      // ── Build PDF ──────────────────────────────────────────────────
+      final pdf = pw.Document();
+
+      const questionsPerPage = 6;
+      final pageCount = (questions.length / questionsPerPage).ceil();
+
+      for (int page = 0; page < pageCount; page++) {
+        final start = page * questionsPerPage;
+        final end = (start + questionsPerPage).clamp(0, questions.length);
+        final pageImages = questionImages.sublist(start, end);
+
+        final col1 = <pw.Widget>[];
+        final col2 = <pw.Widget>[];
+        for (int i = 0; i < pageImages.length; i++) {
+          if (i % 2 == 0) {
+            col1.add(pageImages[i]);
+          } else {
+            col2.add(pageImages[i]);
+          }
+        }
+
+        pdf.addPage(
+          pw.Page(
+            pageFormat: PdfPageFormat.a4,
+            margin: const pw.EdgeInsets.symmetric(horizontal: 28, vertical: 28),
+            build: (pw.Context ctx) {
+              return pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  // ── Header ──
+                  if (page == 0) ...[
+                    pw.Container(
+                      width: double.infinity,
+                      padding: const pw.EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 10),
+                      decoration: pw.BoxDecoration(
+                        color: const PdfColor.fromInt(0xFF1E3C72),
+                        borderRadius: pw.BorderRadius.circular(8),
+                      ),
+                      child: pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text(
+                            'EduQuiz O-Level',
+                            style: pw.TextStyle(
+                              font: ttf,
+                              color: PdfColors.white,
+                              fontSize: 10,
+                            ),
+                          ),
+                          pw.SizedBox(height: 4),
+                          pw.Text(
+                            displayName,
+                            style: pw.TextStyle(
+                              font: ttfBold,
+                              color: PdfColors.white,
+                              fontSize: 20,
+                            ),
+                          ),
+                          pw.SizedBox(height: 4),
+                          pw.Text(
+                            '${questions.length} Questions  •  Time Limit: 45 minutes',
+                            style: pw.TextStyle(
+                              font: ttf,
+                              color: PdfColors.grey300,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    pw.SizedBox(height: 16),
+                  ],
+
+                  // ── 2-Column Questions Images ──
+                  pw.Expanded(
+                    child: pw.Row(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Expanded(
+                          child: pw.Column(
+                            crossAxisAlignment: pw.CrossAxisAlignment.start,
+                            children: col1,
+                          ),
+                        ),
+                        pw.SizedBox(width: 16),
+                        pw.Container(width: 0.5, color: PdfColors.grey300),
+                        pw.SizedBox(width: 16),
+                        pw.Expanded(
+                          child: pw.Column(
+                            crossAxisAlignment: pw.CrossAxisAlignment.start,
+                            children: col2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // ── Footer ──
+                  pw.Divider(color: PdfColors.grey300, thickness: 0.5),
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Text(
+                        'EduQuiz O-Level – $displayName',
+                        style: pw.TextStyle(
+                            font: ttf, fontSize: 9, color: PdfColors.grey),
+                      ),
+                      pw.Text(
+                        'Page ${page + 1} / $pageCount',
+                        style: pw.TextStyle(
+                            font: ttf, fontSize: 9, color: PdfColors.grey),
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      }
+
+      // ── Print / Save ──
+      if (!context.mounted) return;
+      await Printing.sharePdf(
+        bytes: await pdf.save(),
+        filename: '${displayName.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_')}_Quiz.pdf',
+      );
+    } catch (e) {
+      if (context.mounted) {
+        try {
+          Navigator.of(context, rootNavigator: true).pop();
+        } catch (_) {}
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('PDF generation failed: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() {});
+    }
+  }
+
+  // Show action dialog when subject card is tapped
+  void _showSubjectActionDialog(BuildContext context, SubjectModel subject,
+      String displayName, String studentId) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        contentPadding: EdgeInsets.zero,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF1E3C72), Color(0xFF2A5298)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    displayName,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'What would you like to do?',
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Start Quiz Button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              child: SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => QuizScreen(
+                          subject: subject,
+                          studentId: studentId,
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.play_circle_outline_rounded),
+                  label: const Text('Start Quiz',
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1E3C72),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ),
+            ),
+            // Download PDF Button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              child: SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _generateAndDownloadPdf(context, subject, displayName);
+                  },
+                  icon: const Icon(Icons.picture_as_pdf_rounded,
+                      color: Color(0xFFE74C3C)),
+                  label: const Text(
+                    'Download Quiz PDF',
+                    style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFFE74C3C)),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side:
+                        const BorderSide(color: Color(0xFFE74C3C), width: 1.5),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+    );
+  }
 
   // Forward all getters to widget for convenience
   String get langCode => widget.langCode;
@@ -446,22 +908,38 @@ class _HomeDashboardState extends State<_HomeDashboard> {
 
   IconData _getIcon(String iconName) {
     switch (iconName) {
-      case 'science': return Icons.science_rounded;
-      case 'calculate': return Icons.calculate_rounded;
-      case 'book': return Icons.book_rounded;
-      case 'history': return Icons.history_edu_rounded;
-      case 'language': return Icons.language_rounded;
-      case 'public': return Icons.public_rounded;
-      case 'volunteer_activism': return Icons.volunteer_activism_rounded;
-      case 'analytics': return Icons.analytics_rounded;
-      case 'gavel': return Icons.gavel_rounded;
-      case 'music_note': return Icons.music_note_rounded;
-      case 'emoji_people': return Icons.emoji_people_rounded;
-      case 'palette': return Icons.palette_rounded;
-      case 'computer': return Icons.computer_rounded;
-      case 'agriculture': return Icons.agriculture_rounded;
-      case 'fitness_center': return Icons.fitness_center_rounded;
-      default: return Icons.school_rounded;
+      case 'science':
+        return Icons.science_rounded;
+      case 'calculate':
+        return Icons.calculate_rounded;
+      case 'book':
+        return Icons.book_rounded;
+      case 'history':
+        return Icons.history_edu_rounded;
+      case 'language':
+        return Icons.language_rounded;
+      case 'public':
+        return Icons.public_rounded;
+      case 'volunteer_activism':
+        return Icons.volunteer_activism_rounded;
+      case 'analytics':
+        return Icons.analytics_rounded;
+      case 'gavel':
+        return Icons.gavel_rounded;
+      case 'music_note':
+        return Icons.music_note_rounded;
+      case 'emoji_people':
+        return Icons.emoji_people_rounded;
+      case 'palette':
+        return Icons.palette_rounded;
+      case 'computer':
+        return Icons.computer_rounded;
+      case 'agriculture':
+        return Icons.agriculture_rounded;
+      case 'fitness_center':
+        return Icons.fitness_center_rounded;
+      default:
+        return Icons.school_rounded;
     }
   }
 
@@ -471,7 +949,8 @@ class _HomeDashboardState extends State<_HomeDashboard> {
     final quizProvider = context.watch<QuizProvider>();
     final authProvider = context.read<AuthProvider>();
 
-    final hasOngoingQuiz = quizProvider.currentSubject != null && !quizProvider.isQuizCompleted;
+    final hasOngoingQuiz =
+        quizProvider.currentSubject != null && !quizProvider.isQuizCompleted;
     final subjects = subjectProvider.subjects;
     final highestScores = quizProvider.highestScores;
 
@@ -528,7 +1007,9 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: (hasOngoingQuiz ? const Color(0xFFEB5757) : const Color(0xFF1E3C72))
+                      color: (hasOngoingQuiz
+                              ? const Color(0xFFEB5757)
+                              : const Color(0xFF1E3C72))
                           .withValues(alpha: 0.3),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
@@ -579,7 +1060,8 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                               color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Icon(Icons.help_outline_rounded, color: Colors.white, size: 28),
+                            child: const Icon(Icons.help_outline_rounded,
+                                color: Colors.white, size: 28),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
@@ -604,7 +1086,8 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                               ],
                             ),
                           ),
-                          const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 16),
+                          const Icon(Icons.arrow_forward_ios_rounded,
+                              color: Colors.white, size: 16),
                         ],
                       ),
               ),
@@ -628,15 +1111,19 @@ class _HomeDashboardState extends State<_HomeDashboard> {
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 // show more card only when not expanded AND there are hidden subjects
-                itemCount: displayedContinue.length + ((!_showAllContinueLearning && hasMore) ? 1 : 0),
+                itemCount: displayedContinue.length +
+                    ((!_showAllContinueLearning && hasMore) ? 1 : 0),
                 itemBuilder: (context, index) {
-                  if (!_showAllContinueLearning && hasMore && index == displayedContinue.length) {
+                  if (!_showAllContinueLearning &&
+                      hasMore &&
+                      index == displayedContinue.length) {
                     // "more" card — expands inline, no navigation
                     return Container(
                       width: 100,
                       margin: const EdgeInsets.only(right: 8, bottom: 8),
                       child: InkWell(
-                        onTap: () => setState(() => _showAllContinueLearning = true),
+                        onTap: () =>
+                            setState(() => _showAllContinueLearning = true),
                         borderRadius: BorderRadius.circular(14),
                         child: Card(
                           color: cardBg,
@@ -651,7 +1138,8 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF1E3C72).withValues(alpha: 0.1),
+                                  color: const Color(0xFF1E3C72)
+                                      .withValues(alpha: 0.1),
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(
@@ -679,7 +1167,11 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                   final subject = displayedContinue[index];
                   final highestResult = highestScores[subject.id];
                   final double calculatedRate = highestResult != null
-                      ? (highestResult.score / (highestResult.totalQuestions == 0 ? 1 : highestResult.totalQuestions)).clamp(0.0, 1.0)
+                      ? (highestResult.score /
+                              (highestResult.totalQuestions == 0
+                                  ? 1
+                                  : highestResult.totalQuestions))
+                          .clamp(0.0, 1.0)
                       : 0.0;
 
                   return Container(
@@ -720,21 +1212,27 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                                       subject.imageUrl ??
                                           'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=400&q=80',
                                       fit: CoverAnchor.center.fit,
-                                      loadingBuilder: (context, child, loadingProgress) {
-                                        if (loadingProgress == null) return child;
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null)
+                                          return child;
                                         return Container(
                                           color: Colors.grey.shade100,
                                           child: const Center(
                                             child: SizedBox(
                                               width: 16,
                                               height: 16,
-                                              child: CircularProgressIndicator(strokeWidth: 2),
+                                              child: CircularProgressIndicator(
+                                                  strokeWidth: 2),
                                             ),
                                           ),
                                         );
                                       },
-                                      errorBuilder: (context, error, stackTrace) => Container(
-                                        color: const Color(0xFF1E3C72).withValues(alpha: 0.05),
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              Container(
+                                        color: const Color(0xFF1E3C72)
+                                            .withValues(alpha: 0.05),
                                         child: Center(
                                           child: Icon(
                                             _getIcon(subject.iconName),
@@ -755,7 +1253,8 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       _getSubjectDisplayName(subject.name),
@@ -768,14 +1267,17 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                                       ),
                                     ),
                                     Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         ClipRRect(
-                                          borderRadius: BorderRadius.circular(4),
+                                          borderRadius:
+                                              BorderRadius.circular(4),
                                           child: LinearProgressIndicator(
                                             value: calculatedRate,
                                             minHeight: 5,
-                                            backgroundColor: Colors.grey.shade200,
+                                            backgroundColor:
+                                                Colors.grey.shade200,
                                             color: const Color(0xFF27AE60),
                                           ),
                                         ),
@@ -827,7 +1329,8 @@ class _HomeDashboardState extends State<_HomeDashboard> {
               const Center(
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 40),
-                  child: Text('Loading subjects...', style: TextStyle(color: Colors.grey)),
+                  child: Text('Loading subjects...',
+                      style: TextStyle(color: Colors.grey)),
                 ),
               )
             else
@@ -854,14 +1357,11 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                     child: InkWell(
                       onTap: () {
                         if (authProvider.currentStudent != null) {
-                          Navigator.push(
+                          _showSubjectActionDialog(
                             context,
-                            MaterialPageRoute(
-                              builder: (_) => QuizScreen(
-                                subject: subject,
-                                studentId: authProvider.currentStudent!.uid!,
-                              ),
-                            ),
+                            subject,
+                            _getSubjectDisplayName(subject.name),
+                            authProvider.currentStudent!.uid!,
                           );
                         }
                       },
@@ -875,7 +1375,8 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                               subject.imageUrl ??
                                   'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=400&q=80',
                               fit: BoxFit.cover,
-                              loadingBuilder: (context, child, loadingProgress) {
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
                                 if (loadingProgress == null) return child;
                                 return Container(
                                   color: Colors.grey.shade100,
@@ -883,13 +1384,16 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                                     child: SizedBox(
                                       width: 18,
                                       height: 18,
-                                      child: CircularProgressIndicator(strokeWidth: 2),
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 2),
                                     ),
                                   ),
                                 );
                               },
-                              errorBuilder: (context, error, stackTrace) => Container(
-                                color: const Color(0xFF1E3C72).withValues(alpha: 0.05),
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Container(
+                                color: const Color(0xFF1E3C72)
+                                    .withValues(alpha: 0.05),
                                 child: Center(
                                   child: Icon(
                                     _getIcon(subject.iconName),
@@ -905,7 +1409,8 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                             flex: 4,
                             child: Container(
                               color: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 6),
                               alignment: Alignment.center,
                               child: Text(
                                 _getSubjectDisplayName(subject.name),
@@ -937,5 +1442,6 @@ class _HomeDashboardState extends State<_HomeDashboard> {
 // Helper alignment enum for continue learning
 enum CoverAnchor {
   center;
+
   BoxFit get fit => BoxFit.cover;
 }
