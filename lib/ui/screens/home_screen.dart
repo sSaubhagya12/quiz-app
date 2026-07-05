@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import '../../utils/pdf_download_helper.dart';
 import 'package:provider/provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -406,9 +408,9 @@ class _HomeDashboardState extends State<_HomeDashboard> {
           await FirebaseService.instance.getQuestionsBySubject(subject.id!);
 
       if (!context.mounted) return;
-      Navigator.pop(context); // close loading dialog
 
       if (questions.isEmpty) {
+        Navigator.pop(context); // close loading dialog
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('No questions found for this subject.'),
@@ -645,9 +647,58 @@ class _HomeDashboardState extends State<_HomeDashboard> {
 
       // ── Print / Save ──
       if (!context.mounted) return;
-      await Printing.sharePdf(
-        bytes: await pdf.save(),
-        filename: '${displayName.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_')}_Quiz.pdf',
+      Navigator.of(context, rootNavigator: true).pop(); // Close loading dialog
+
+      final pdfBytes = await pdf.save();
+      final filename = '${displayName.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_')}_Quiz.pdf';
+
+      if (!context.mounted) return;
+      showDialog(
+        context: context,
+        builder: (dialogCtx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Row(
+            children: [
+              Icon(Icons.check_circle_outline_rounded, color: Colors.green, size: 28),
+              SizedBox(width: 8),
+              Text(
+                'PDF Ready',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          content: Text(
+            '"$displayName" ප්‍රශ්න පත්‍රය සාර්ථකව සකස් කරන ලදී. බාගත කිරීමට පහත බොත්තම ක්ලික් කරන්න.\n\nPDF for "$displayName" is ready. Click the button below to download.',
+            style: const TextStyle(fontSize: 14),
+          ),
+          actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogCtx),
+              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pop(dialogCtx);
+                if (kIsWeb) {
+                  downloadPdfFile(pdfBytes, filename);
+                } else {
+                  Printing.sharePdf(
+                    bytes: pdfBytes,
+                    filename: filename,
+                  );
+                }
+              },
+              icon: const Icon(Icons.download_rounded),
+              label: const Text('Download Now'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1E3C72),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+          ],
+        ),
       );
     } catch (e) {
       if (context.mounted) {
@@ -881,11 +932,15 @@ class _HomeDashboardState extends State<_HomeDashboard> {
         if (langCode == 'si') return 'නර්තනය';
         if (langCode == 'ta') return 'நடனம்';
         return 'Dancing';
+
       case 'art (act)':
       case 'art':
-        if (langCode == 'si') return 'නාට්‍ය හා රංග කලාව';
+      case 'art & drama':
+      case 'චිත්‍ර හා රඟකලාව':
+      case 'චිත්‍ර හා රංග කලාව':
+        if (langCode == 'si') return 'චිත්‍ර හා රංග කලාව';
         if (langCode == 'ta') return 'சித்திரமும் நாடகமும்';
-        return 'Art & Drama';
+        return 'Art';
       case 'information & communication':
       case 'ict':
         if (langCode == 'si') return 'තොරතුරු තාක්ෂණය';
@@ -893,7 +948,9 @@ class _HomeDashboardState extends State<_HomeDashboard> {
         return 'ICT';
       case 'agriculture & food technology':
       case 'agriculture':
-        if (langCode == 'si') return 'කෘෂිකර්ම හා ආහාර';
+      case 'කෘෂිකර්මය':
+      case 'කෘෂිකර්ම හා ආහාර':
+        if (langCode == 'si') return 'කෘෂිකර්මය';
         if (langCode == 'ta') return 'விவசாயம்';
         return 'Agriculture';
       case 'health & physical education':

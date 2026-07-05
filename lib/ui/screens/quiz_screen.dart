@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../logic/providers/quiz_provider.dart';
+import '../../logic/providers/settings_provider.dart';
 import '../../data/models/subject_model.dart';
 import 'results_screen.dart';
 
@@ -15,6 +16,87 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
+  String _getSubjectDisplayName(String subjectName, String langCode) {
+    switch (subjectName.toLowerCase()) {
+      case 'religion':
+        if (langCode == 'si') return 'ආගම';
+        if (langCode == 'ta') return 'சமயம்';
+        return 'Religion';
+      case 'sinhala':
+        if (langCode == 'si') return 'සිංහල';
+        if (langCode == 'ta') return 'சிங்களம்';
+        return 'Sinhala';
+      case 'english':
+        if (langCode == 'si') return 'ඉංග්‍රීසි';
+        if (langCode == 'ta') return 'ஆங்கிலம்';
+        return 'English';
+      case 'mathematics':
+      case 'math':
+        if (langCode == 'si') return 'ගණිතය';
+        if (langCode == 'ta') return 'கணிதம்';
+        return 'Mathematics';
+      case 'science':
+      case 'sci':
+        if (langCode == 'si') return 'විද්‍යාව';
+        if (langCode == 'ta') return 'அறிவியல்';
+        return 'Science';
+      case 'history':
+        if (langCode == 'si') return 'ඉතිහාසය';
+        if (langCode == 'ta') return 'வரலாறு';
+        return 'History';
+      case 'business & accounting studies':
+      case 'business':
+        if (langCode == 'si') return 'ව්‍යාපාර හා ගිණුම්කරණය';
+        if (langCode == 'ta') return 'வணிகமும் கணக்கீடும்';
+        return 'Business & Accounts';
+      case 'geography':
+      case 'geo':
+        if (langCode == 'si') return 'භූගෝල විද්‍යාව';
+        if (langCode == 'ta') return 'புவியியல்';
+        return 'Geography';
+      case 'civic education':
+      case 'civic':
+        if (langCode == 'si') return 'පුරවැසි අධ්‍යාපනය';
+        if (langCode == 'ta') return 'குடிமையியல் கல்வி';
+        return 'Civic Education';
+      case 'music':
+        if (langCode == 'si') return 'සංගීතය';
+        if (langCode == 'ta') return 'சங்கீதம்';
+        return 'Music';
+      case 'dancing':
+        if (langCode == 'si') return 'නර්තනය';
+        if (langCode == 'ta') return 'நடனம்';
+        return 'Dancing';
+      case 'art (act)':
+      case 'art':
+      case 'art & drama':
+      case 'චිත්‍ර හා රඟකලාව':
+      case 'චිත්‍ර හා රංග කලාව':
+        if (langCode == 'si') return 'චිත්‍ර හා රංග කලාව';
+        if (langCode == 'ta') return 'சித்திரமும் நாடகமும்';
+        return 'Art';
+      case 'information & communication':
+      case 'ict':
+        if (langCode == 'si') return 'තොරතුරු තාක්ෂණය';
+        if (langCode == 'ta') return 'தகவல் தொழில்நுட்பம்';
+        return 'ICT';
+      case 'agriculture & food technology':
+      case 'agriculture':
+      case 'කෘෂිකර්මය':
+      case 'කෘෂිකර්ම හා ආහාර':
+        if (langCode == 'si') return 'කෘෂිකර්මය';
+        if (langCode == 'ta') return 'விவசாயம்';
+        return 'Agriculture';
+      case 'health & physical education':
+      case 'health':
+        if (langCode == 'si') return 'සෞඛ්‍ය හා ශාරීරික';
+        if (langCode == 'ta') return 'சுகாதாரமும் உடற்கல்வியும்';
+        return 'Health & PE';
+      default:
+        return subjectName;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -155,6 +237,8 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   Widget build(BuildContext context) {
     final quizProvider = context.watch<QuizProvider>();
+    final settingsProvider = context.watch<SettingsProvider>();
+    final displayName = _getSubjectDisplayName(widget.subject.name, settingsProvider.langCode);
 
     if (quizProvider.isTimeOut && !quizProvider.timeOutNotified) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -217,7 +301,7 @@ class _QuizScreenState extends State<QuizScreen> {
     if (quizProvider.errorMessage != null && quizProvider.questions.isEmpty) {
       return Scaffold(
         appBar: AppBar(
-          title: Text(widget.subject.name,
+          title: Text(displayName,
               style: const TextStyle(color: Colors.white)),
           backgroundColor: const Color(0xFF1E3C72),
           iconTheme: const IconThemeData(color: Colors.white),
@@ -264,7 +348,7 @@ class _QuizScreenState extends State<QuizScreen> {
       backgroundColor: const Color(0xFFF0F4FF),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1E3C72),
-        title: Text(widget.subject.name,
+        title: Text(displayName,
             style: const TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [

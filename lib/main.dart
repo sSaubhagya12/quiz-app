@@ -8,8 +8,12 @@ import 'logic/providers/quiz_provider.dart';
 import 'logic/providers/settings_provider.dart';
 import 'logic/providers/theme_provider.dart';
 import 'ui/screens/login_screen.dart';
-import 'ui/screens/signup_screen.dart';
 import 'ui/screens/home_screen.dart';
+import 'ui/screens/signup_screen.dart';
+
+
+
+
 
 void main() async {
   // Firebase Initialize කිරීම
@@ -141,6 +145,7 @@ class WelcomeOrLoginPage extends StatelessWidget {
                     foregroundColor: const Color(0xFF1E3C72),
                   ),
                 ),
+
               ],
             ),
           ),

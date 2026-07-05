@@ -67,8 +67,24 @@ class _ChooseSubjectScreenState extends State<ChooseSubjectScreen> {
   String _t(String key) => _tr[_langCode]?[key] ?? key;
 
   // ── Subject display names per language ───────────────────────────────────────
+
+
   String _subjectName(String name) {
-    if (_langCode == 'en') return name;
+    final nameLower = name.toLowerCase();
+
+    if (_langCode == 'en') {
+      if (nameLower == 'art (act)' || nameLower == 'art' || nameLower == 'art & drama' || nameLower == 'චිත්‍ර හා රඟකලාව' || nameLower == 'චිත්‍ර හා රංග කලාව') {
+        return 'Art';
+      }
+      if (nameLower == 'agriculture & food technology' || nameLower == 'agriculture' || nameLower == 'කෘෂිකර්මය' || nameLower == 'කෘෂිකර්ම හා ආහාර') {
+        return 'Agriculture';
+      }
+      if (nameLower == 'business & accounting studies' || nameLower == 'business') {
+        return 'Business & Accounting Studies';
+      }
+      return name;
+    }
+
     const si = {
       'Religion': 'ආගම',
       'Sinhala': 'සිංහල',
@@ -81,9 +97,12 @@ class _ChooseSubjectScreenState extends State<ChooseSubjectScreen> {
       'Civic Education': 'පුරවැසි අධ්‍යාපනය',
       'Music': 'සංගීතය',
       'Dancing': 'නර්තනය',
-      'Art (Act)': 'නාට්‍ය හා රංග කලාව',
+      'Art (Act)': 'චිත්‍ර හා රංග කලාව',
+      'Art': 'චිත්‍ර හා රංග කලාව',
+      'Art & Drama': 'චිත්‍ර හා රංග කලාව',
       'Information & Communication': 'තොරතුරු තාක්ෂණය',
-      'Agriculture & Food Technology': 'කෘෂිකර්ම හා ආහාර',
+      'Agriculture & Food Technology': 'කෘෂිකර්මය',
+      'Agriculture': 'කෘෂිකර්මය',
       'Health & Physical Education': 'සෞඛ්‍ය හා ශාරීරික',
     };
     const ta = {
@@ -99,10 +118,25 @@ class _ChooseSubjectScreenState extends State<ChooseSubjectScreen> {
       'Music': 'சங்கீதம்',
       'Dancing': 'நடனம்',
       'Art (Act)': 'சித்திரமும் நாடகமும்',
+      'Art': 'சித்திரமும் நாடகமும்',
+      'Art & Drama': 'சித்திரமும் நாடகமும்',
       'Information & Communication': 'தகவல் தொழில்நுட்பம்',
       'Agriculture & Food Technology': 'விவசாயம்',
+      'Agriculture': 'விவசாயம்',
       'Health & Physical Education': 'சுகாதாரமும் உடற்கல்வியும்',
     };
+
+    if (nameLower == 'චිත්‍ර හා රඟකලාව' || nameLower == 'චිත්‍ර හා රංග කලාව') {
+      if (_langCode == 'si') return 'චිත්‍ර හා රංග කලාව';
+      if (_langCode == 'ta') return 'சித்திரமும் நாடகமும்';
+      return 'Art';
+    }
+    if (nameLower == 'කෘෂිකර්මය' || nameLower == 'කෘෂිකර්ම හා ආහාර') {
+      if (_langCode == 'si') return 'කෘෂිකර්මය';
+      if (_langCode == 'ta') return 'விவசாயம்';
+      return 'Agriculture';
+    }
+
     if (_langCode == 'si') return si[name] ?? name;
     if (_langCode == 'ta') return ta[name] ?? name;
     return name;

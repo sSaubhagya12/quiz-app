@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../logic/providers/quiz_provider.dart';
 import '../../logic/providers/subject_provider.dart';
+import '../../logic/providers/settings_provider.dart';
 import '../../data/models/quiz_result_model.dart';
 import '../widgets/emoji_rain.dart';
 
@@ -101,7 +102,9 @@ class _ResultsScreenState extends State<ResultsScreen>
     final seconds = displayResult.timeSpent % 60;
     final wrongCount = displayResult.totalQuestions - displayResult.score;
     final config = _getConfig(percentage);
-    final subjectName = quizProvider.currentSubject?.name ?? '';
+    final langCode = context.watch<SettingsProvider>().langCode;
+    final rawSubjectName = quizProvider.currentSubject?.name ?? '';
+    final subjectName = rawSubjectName.isNotEmpty ? _translateSubject(rawSubjectName, langCode) : '';
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0F4FF),
@@ -471,27 +474,9 @@ class _SubjectScoreRow extends StatelessWidget {
     return const Color(0xFF27AE60);
   }
 
-  String _friendlyName(String id) {
-    final map = {
-      'sinhala': 'සිංහල',
-      'science': 'විද්‍යාව',
-      'history': 'ඉතිහාසය',
-      'maths': 'ගණිතය',
-      'english': 'ඉංග්‍රීසි',
-      'religion': 'ආගම',
-      'geography': 'භූගෝලය',
-      'civic': 'පුරවැසි',
-      'art': 'කලා',
-      'dance': 'නර්තන',
-    };
-    for (var key in map.keys) {
-      if (id.toLowerCase().contains(key)) return map[key]!;
-    }
-    return id;
-  }
-
   @override
   Widget build(BuildContext context) {
+    final langCode = context.watch<SettingsProvider>().langCode;
     final barColor = _barColor(percentage);
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -515,9 +500,9 @@ class _SubjectScoreRow extends StatelessWidget {
         children: [
           // Subject name
           SizedBox(
-            width: 90,
+            width: 100, // Slightly wider to fit longer Sinhala names comfortably
             child: Text(
-              _friendlyName(subjectId),
+              _translateSubject(subjectId, langCode),
               style: TextStyle(
                 fontWeight:
                     isHighlighted ? FontWeight.bold : FontWeight.w500,
@@ -753,3 +738,87 @@ class _OptionRow extends StatelessWidget {
     );
   }
 }
+
+String _translateSubject(String subjectName, String langCode) {
+  switch (subjectName.toLowerCase()) {
+    case 'religion':
+      if (langCode == 'si') return 'ආගම';
+      if (langCode == 'ta') return 'சமயம்';
+      return 'Religion';
+    case 'sinhala':
+      if (langCode == 'si') return 'සිංහල';
+      if (langCode == 'ta') return 'சிங்களம்';
+      return 'Sinhala';
+    case 'english':
+      if (langCode == 'si') return 'ඉංග්‍රීසි';
+      if (langCode == 'ta') return 'ஆங்கிலம்';
+      return 'English';
+    case 'mathematics':
+    case 'maths':
+    case 'math':
+      if (langCode == 'si') return 'ගණිතය';
+      if (langCode == 'ta') return 'கணிதம்';
+      return 'Mathematics';
+    case 'science':
+    case 'sci':
+      if (langCode == 'si') return 'විද්‍යාව';
+      if (langCode == 'ta') return 'அறிவியல்';
+      return 'Science';
+    case 'history':
+      if (langCode == 'si') return 'ඉතිහාසය';
+      if (langCode == 'ta') return 'வரலாறு';
+      return 'History';
+    case 'business & accounting studies':
+    case 'business':
+      if (langCode == 'si') return 'ව්‍යාපාර හා ගිණුම්කරණය';
+      if (langCode == 'ta') return 'வணிகமும் கணக்கீடும்';
+      return 'Business & Accounts';
+    case 'geography':
+    case 'geo':
+      if (langCode == 'si') return 'භූගෝල විද්‍යාව';
+      if (langCode == 'ta') return 'புவியியல்';
+      return 'Geography';
+    case 'civic education':
+    case 'civic':
+      if (langCode == 'si') return 'පුරවැසි අධ්‍යාපනය';
+      if (langCode == 'ta') return 'குடிமையியல் கல்வி';
+      return 'Civic Education';
+    case 'music':
+      if (langCode == 'si') return 'සංගීතය';
+      if (langCode == 'ta') return 'சங்கீதம்';
+      return 'Music';
+    case 'dancing':
+    case 'dance':
+      if (langCode == 'si') return 'නර්තනය';
+      if (langCode == 'ta') return 'நடனம்';
+      return 'Dancing';
+    case 'art (act)':
+    case 'art':
+    case 'art & drama':
+    case 'චිත්‍ර හා රඟකලාව':
+    case 'චිත්‍ර හා රංග කලාව':
+      if (langCode == 'si') return 'චිත්‍ර හා රංග කලාව';
+      if (langCode == 'ta') return 'சித்திரமும் நாடகமும்';
+      return 'Art';
+    case 'information & communication':
+    case 'ict':
+      if (langCode == 'si') return 'තොරතුරු තාක්ෂණය';
+      if (langCode == 'ta') return 'தகவல் தொழில்நுட்பம்';
+      return 'ICT';
+    case 'agriculture & food technology':
+    case 'agriculture':
+    case 'කෘෂිකර්මය':
+    case 'කෘෂිකර්ම හා ආහාර':
+      if (langCode == 'si') return 'කෘෂිකර්මය';
+      if (langCode == 'ta') return 'விவசாயம்';
+      return 'Agriculture';
+    case 'health & physical education':
+    case 'health':
+      if (langCode == 'si') return 'සෞඛ්‍ය හා ශාරීරික';
+      if (langCode == 'ta') return 'சுகாதாரமும் உடற்கல்வியும்';
+      return 'Health & PE';
+    default:
+      return subjectName;
+  }
+}
+
