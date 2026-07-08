@@ -43,19 +43,19 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'YOUR_ANDROID_API_KEY',
-    appId: 'YOUR_ANDROID_APP_ID',
-    messagingSenderId: 'YOUR_SENDER_ID',
-    projectId: 'YOUR_PROJECT_ID',
-    storageBucket: 'YOUR_PROJECT_ID.appspot.com',
+    apiKey: 'AIzaSyCt53udBqwRxr9oXuAhJD84w9O_yJV1ITc',
+    appId: '1:668766133031:android:f95b7c113530796af26702',
+    messagingSenderId: '668766133031',
+    projectId: 'quiz-app-202612',
+    storageBucket: 'quiz-app-202612.firebasestorage.app',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'YOUR_API_KEY',
-    appId: 'YOUR_APP_ID',
-    messagingSenderId: 'YOUR_SENDER_ID',
-    projectId: 'YOUR_PROJECT_ID',
-    authDomain: 'YOUR_PROJECT_ID.firebaseapp.com',
-    storageBucket: 'YOUR_PROJECT_ID.appspot.com',
+    apiKey: 'AIzaSyCt53udBqwRxr9oXuAhJD84w9O_yJV1ITc',
+    appId: '1:668766133031:web:f95b7c113530796af26702',
+    messagingSenderId: '668766133031',
+    projectId: 'quiz-app-202612',
+    authDomain: 'quiz-app-202612.firebaseapp.com',
+    storageBucket: 'quiz-app-202612.firebasestorage.app',
   );
 }

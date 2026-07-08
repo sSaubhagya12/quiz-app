@@ -106,8 +106,9 @@ class _ResultsScreenState extends State<ResultsScreen>
     final rawSubjectName = quizProvider.currentSubject?.name ?? '';
     final subjectName = rawSubjectName.isNotEmpty ? _translateSubject(rawSubjectName, langCode) : '';
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: const Color(0xFFF0F4FF),
+      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF0F4FF),
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: const Text('Quiz Results',
@@ -314,11 +315,11 @@ class _ResultsScreenState extends State<ResultsScreen>
                     quizProvider.reviewAnswers.isNotEmpty) ...[
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: [
                         BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
+                            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
                             blurRadius: 8)
                       ],
                     ),
@@ -353,7 +354,7 @@ class _ResultsScreenState extends State<ResultsScreen>
                 // OTHER SUBJECTS SCORES
                 // =====================
                 if (quizProvider.highestScores.isNotEmpty) ...[
-                  const Text(
+                const Text(
                     'ඔබගේ ඉහළම ලකුණු',
                     style: TextStyle(
                         fontSize: 16,
@@ -478,22 +479,23 @@ class _SubjectScoreRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final langCode = context.watch<SettingsProvider>().langCode;
     final barColor = _barColor(percentage);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: isHighlighted
-            ? const Color(0xFF1E3C72).withValues(alpha: 0.07)
-            : Colors.white,
+            ? const Color(0xFF1E3C72).withValues(alpha: 0.15)
+            : (isDark ? const Color(0xFF1E1E1E) : Colors.white),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isHighlighted
-              ? const Color(0xFF1E3C72).withValues(alpha: 0.3)
-              : Colors.grey.withValues(alpha: 0.15),
+              ? const Color(0xFF1E3C72).withValues(alpha: 0.4)
+              : (isDark ? Colors.white12 : Colors.grey.withValues(alpha: 0.15)),
         ),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04), blurRadius: 5)
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04), blurRadius: 5)
         ],
       ),
       child: Row(
@@ -566,14 +568,15 @@ class _InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05), blurRadius: 6)
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05), blurRadius: 6)
         ],
       ),
       child: Column(
@@ -619,6 +622,7 @@ class _ReviewCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isCorrect = answer.isCorrect;
     final question = answer.question;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -678,7 +682,7 @@ class _ReviewCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFF0F4FF),
+                color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFF0F4FF),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(

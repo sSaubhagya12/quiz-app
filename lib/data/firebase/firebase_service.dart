@@ -179,7 +179,7 @@ class FirebaseService {
     if (resSnap.docs.isNotEmpty) {
       double totalScore = 0;
       for (var d in resSnap.docs) {
-        totalScore += (d.data()['score'] ?? 0) as double;
+        totalScore += ((d.data()['score'] ?? 0) as num).toDouble();
       }
       double newRate = totalScore / resSnap.docs.length;
       await updateSubjectProgress(result.subjectId, newRate);
