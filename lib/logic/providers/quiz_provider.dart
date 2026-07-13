@@ -326,6 +326,29 @@ class QuizProvider extends ChangeNotifier {
     });
   }
 
+  // ==========================================
+  // 7. CLEAR QUIZ STATE (Log out / Reset)
+  // ==========================================
+  void clearQuizState() {
+    _stopTimer();
+    _currentSubject = null;
+    _questions = [];
+    _currentQuestionIndex = 0;
+    _selectedOption = -1;
+    _studentAnswersMap.clear();
+    _secondsElapsed = 0;
+    _isQuizCompleted = false;
+    _lastQuizResult = null;
+    _reviewAnswers = [];
+    _highestScores = {};
+    _showReviewPanel = false;
+    _isTimeOut = false;
+    _timeOutNotified = false;
+    _errorMessage = null;
+    _currentStudentId = null;
+    notifyListeners();
+  }
+
   void _stopTimer() {
     _timer?.cancel();
     _timer = null;

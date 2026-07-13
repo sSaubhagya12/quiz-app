@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../logic/providers/auth_provider.dart';
 import '../../logic/providers/theme_provider.dart';
 import '../../logic/providers/settings_provider.dart';
+import '../../logic/providers/quiz_provider.dart';
 import 'profile_screen.dart';
 import 'login_screen.dart';
 
@@ -319,6 +320,7 @@ class SettingsScreen extends StatefulWidget {
           ),
           ElevatedButton(
             onPressed: () async {
+              context.read<QuizProvider>().clearQuizState();
               await context.read<AuthProvider>().logout();
               if (context.mounted) {
                 Navigator.pop(ctx);

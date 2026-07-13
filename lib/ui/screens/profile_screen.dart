@@ -728,6 +728,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   height: 46,
                   child: TextButton.icon(
                     onPressed: () async {
+                      context.read<QuizProvider>().clearQuizState();
                       await authProvider.logout();
                       if (context.mounted) {
                         Navigator.pushAndRemoveUntil(

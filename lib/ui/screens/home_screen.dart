@@ -1243,19 +1243,7 @@ class _HomeDashboardState extends State<_HomeDashboard> {
                       ),
                       clipBehavior: Clip.antiAlias,
                       child: InkWell(
-                        onTap: () {
-                          if (authProvider.currentStudent != null) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => QuizScreen(
-                                  subject: subject,
-                                  studentId: authProvider.currentStudent!.uid!,
-                                ),
-                              ),
-                            );
-                          }
-                        },
+                        onTap: null,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

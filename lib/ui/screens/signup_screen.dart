@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import '../../logic/providers/auth_provider.dart';
 import '../../data/models/student_model.dart';
 import 'home_screen.dart';
@@ -18,6 +19,9 @@ class _SignupScreenState extends State<SignupScreen> {
   final _schoolController = TextEditingController();
   final _gradeController = TextEditingController();
   final _yearController = TextEditingController();
+  final _phoneController = TextEditingController();
+  String _completePhoneNumber = '';
+  bool _isPasswordVisible = false;
 
   @override
   void dispose() {
@@ -27,6 +31,7 @@ class _SignupScreenState extends State<SignupScreen> {
     _schoolController.dispose();
     _gradeController.dispose();
     _yearController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
@@ -49,6 +54,7 @@ class _SignupScreenState extends State<SignupScreen> {
       school: _schoolController.text,
       grade: _gradeController.text,
       oLevelYear: oLevelYear,
+      phone: _completePhoneNumber,
     );
 
     final success = await authProvider.register(newStudent, _passwordController.text);
@@ -106,8 +112,35 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 16),
                 TextField(
                   controller: _passwordController,
-                  decoration: const InputDecoration(labelText: "Password (Min 8 characters)", border: OutlineInputBorder(), prefixIcon: Icon(Icons.lock)),
-                  obscureText: true,
+                  obscureText: !_isPasswordVisible,
+                  decoration: InputDecoration(
+                    labelText: "Password (Min 8 characters)",
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.lock),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isPasswordVisible
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                IntlPhoneField(
+                  decoration: const InputDecoration(
+                    labelText: "Phone Number (Optional)",
+                    border: OutlineInputBorder(),
+                  ),
+                  initialCountryCode: 'LK',
+                  onChanged: (phone) {
+                    _completePhoneNumber = phone.completeNumber;
+                  },
                 ),
                 const SizedBox(height: 16),
                 TextField(

@@ -34,6 +34,7 @@ dependencies:
   printing: ^5.13.2
   google_fonts: ^6.2.1
   screenshot: ^3.0.0
+  intl_phone_field: ^3.2.0
 
 dev_dependencies:
   flutter_test:
