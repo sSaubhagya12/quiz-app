@@ -59,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
       'si': {
         'account': 'ගිණුම',
         'notifications': 'දැනුම්දීම්',
-        'darkmode': 'දාර්ක් මෝඩ්',
+        'darkmode': 'ඩාර්ක් මෝඩ්',
         'language': 'භාෂාව',
         'help': 'උදවු සහ සහයෝගය',
         'about': 'ගැන',
@@ -519,7 +519,8 @@ class _HomeDashboardState extends State<_HomeDashboard> {
           ),
         );
 
-        final imageBytes = await sc.captureFromWidget(widget, delay: Duration.zero);
+        final imageBytes =
+            await sc.captureFromWidget(widget, delay: Duration.zero);
         questionImages.add(pw.Image(pw.MemoryImage(imageBytes)));
       }
 
@@ -650,16 +651,19 @@ class _HomeDashboardState extends State<_HomeDashboard> {
       Navigator.of(context, rootNavigator: true).pop(); // Close loading dialog
 
       final pdfBytes = await pdf.save();
-      final filename = '${displayName.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_')}_Quiz.pdf';
+      final filename =
+          '${displayName.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_')}_Quiz.pdf';
 
       if (!context.mounted) return;
       showDialog(
         context: context,
         builder: (dialogCtx) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: const Row(
             children: [
-              Icon(Icons.check_circle_outline_rounded, color: Colors.green, size: 28),
+              Icon(Icons.check_circle_outline_rounded,
+                  color: Colors.green, size: 28),
               SizedBox(width: 8),
               Text(
                 'PDF Ready',
@@ -671,7 +675,8 @@ class _HomeDashboardState extends State<_HomeDashboard> {
             '"$displayName" ප්‍රශ්න පත්‍රය සාර්ථකව සකස් කරන ලදී. බාගත කිරීමට පහත බොත්තම ක්ලික් කරන්න.\n\nPDF for "$displayName" is ready. Click the button below to download.',
             style: const TextStyle(fontSize: 14),
           ),
-          actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          actionsPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogCtx),
@@ -694,7 +699,8 @@ class _HomeDashboardState extends State<_HomeDashboard> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1E3C72),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
               ),
             ),
           ],

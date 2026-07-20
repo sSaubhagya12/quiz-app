@@ -38,7 +38,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void didUpdateWidget(covariant ProfileScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.initialLangCode != null && widget.initialLangCode != oldWidget.initialLangCode) {
+    if (widget.initialLangCode != null &&
+        widget.initialLangCode != oldWidget.initialLangCode) {
       _langCode = widget.initialLangCode!;
     }
   }
@@ -73,15 +74,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         'logout': 'Logout',
       },
       'si': {
-        'profile': 'Profile',
+        'profile': 'ගිණුම',
         'dark_mode': 'Dark mode',
-        'edit_profile': 'PROFILE සංස්කරණය',
+        'edit_profile': 'ගිණුම සංස්කරණය',
         'personal_info': 'පෞද්ගලික තොරතුරු',
         'email': 'විද්‍යුත් තැපෑල',
         'phone': 'දුරකතන අංකය',
         'academic_summary': 'අධ්‍යාපනික සාරාංශය',
         'school': 'පාසල',
-        'olevel_year': 'ඕ/ල විභාග වසර',
+        'olevel_year': 'සා/පෙළ විභාග වසර',
         'quiz_result': 'ප්‍රශ්නාවලි ප්‍රතිඵල',
         'take_photo': 'පින්තූරයක් ගන්න',
         'choose_photo': 'පින්තූරයක් තෝරන්න',
@@ -142,8 +143,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final picker = ImagePicker();
       final XFile? pickedFile = await picker.pickImage(
         source: source,
-        imageQuality: 60,   // quality අඩු කළොත් file size අඩු වේ
-        maxWidth: 600,       // max width 600px — Firestore limit සඳහා
+        imageQuality: 60, // quality අඩු කළොත් file size අඩු වේ
+        maxWidth: 600, // max width 600px — Firestore limit සඳහා
       );
 
       if (pickedFile == null) return; // User cancelled
@@ -196,7 +197,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
     } catch (e) {
       if (context.mounted) {
-        try { Navigator.of(context, rootNavigator: true).pop(); } catch (_) {}
+        try {
+          Navigator.of(context, rootNavigator: true).pop();
+        } catch (_) {}
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to process photo: $e'),
@@ -225,13 +228,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildMainAvatar(StudentModel? student, bool isDark, Color textColor) {
     final photoUrl = student?.photoUrl ?? '';
     final provider = _resolveImageProvider(photoUrl);
-    final initial = student?.name.isNotEmpty == true ? student!.name[0].toUpperCase() : 'S';
+    final initial =
+        student?.name.isNotEmpty == true ? student!.name[0].toUpperCase() : 'S';
     return CircleAvatar(
       radius: 54,
       backgroundColor: isDark ? const Color(0xFF2C2C2C) : Colors.grey.shade200,
       backgroundImage: provider,
       child: provider == null
-          ? Text(initial, style: TextStyle(color: textColor, fontSize: 48, fontWeight: FontWeight.bold))
+          ? Text(initial,
+              style: TextStyle(
+                  color: textColor, fontSize: 48, fontWeight: FontWeight.bold))
           : null,
     );
   }
@@ -279,7 +285,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: Colors.black54,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.close, color: Colors.white, size: 22),
+                    child:
+                        const Icon(Icons.close, color: Colors.white, size: 22),
                   ),
                 ),
               ),
@@ -290,7 +297,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _showPhotoOptionsDialog(BuildContext context, AuthProvider authProvider, StudentModel? student) {
+  void _showPhotoOptionsDialog(
+      BuildContext context, AuthProvider authProvider, StudentModel? student) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -312,21 +320,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               ListTile(
-                leading: const Icon(Icons.photo_camera, color: Color(0xFF1E3C72)),
+                leading:
+                    const Icon(Icons.photo_camera, color: Color(0xFF1E3C72)),
                 title: Text(_t('take_photo')),
                 onTap: () async {
                   Navigator.pop(ctx);
                   await _pickAndUploadPhoto(
-                    context, authProvider, student, ImageSource.camera);
+                      context, authProvider, student, ImageSource.camera);
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.photo_library, color: Color(0xFF1E3C72)),
+                leading:
+                    const Icon(Icons.photo_library, color: Color(0xFF1E3C72)),
                 title: Text(_t('choose_photo')),
                 onTap: () async {
                   Navigator.pop(ctx);
                   await _pickAndUploadPhoto(
-                    context, authProvider, student, ImageSource.gallery);
+                      context, authProvider, student, ImageSource.gallery);
                 },
               ),
               ListTile(
@@ -374,12 +384,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _showEditProfileDialog(BuildContext context, AuthProvider authProvider, StudentModel? student) {
+  void _showEditProfileDialog(
+      BuildContext context, AuthProvider authProvider, StudentModel? student) {
     final nameController = TextEditingController(text: student?.name);
     final phoneController = TextEditingController(text: student?.phone);
     final schoolController = TextEditingController(text: student?.school);
     final gradeController = TextEditingController(text: student?.grade);
-    final yearController = TextEditingController(text: '${student?.oLevelYear ?? 2026}');
+    final yearController =
+        TextEditingController(text: '${student?.oLevelYear ?? 2026}');
 
     showDialog(
       context: context,
@@ -459,8 +471,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Widget bodyContent = SingleChildScrollView(
       child: Column(
         children: [
-
-
           Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -469,14 +479,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 10),
                 // Central Profile Avatar with camera/edit icon
                 GestureDetector(
-                  onTap: () => _showPhotoOptionsDialog(context, authProvider, student),
+                  onTap: () =>
+                      _showPhotoOptionsDialog(context, authProvider, student),
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
                       Container(
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: const Color(0xFF1E3C72), width: 3),
+                          border: Border.all(
+                              color: const Color(0xFF1E3C72), width: 3),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withValues(alpha: 0.1),
@@ -485,7 +497,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             )
                           ],
                         ),
-                        child: _buildMainAvatar(student, isDark, textPrimaryColor),
+                        child:
+                            _buildMainAvatar(student, isDark, textPrimaryColor),
                       ),
                       Positioned(
                         bottom: 0,
@@ -523,7 +536,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   width: 170,
                   height: 38,
                   child: OutlinedButton(
-                    onPressed: () => _showEditProfileDialog(context, authProvider, student),
+                    onPressed: () =>
+                        _showEditProfileDialog(context, authProvider, student),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: textPrimaryColor,
                       side: BorderSide(color: textPrimaryColor, width: 1.5),
@@ -533,7 +547,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     child: Text(
                       _t('edit_profile'),
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 12, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -548,7 +563,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
+                        color:
+                            Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       )
@@ -559,7 +575,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.person_outline_rounded, color: textPrimaryColor, size: 20),
+                          Icon(Icons.person_outline_rounded,
+                              color: textPrimaryColor, size: 20),
                           const SizedBox(width: 8),
                           Text(
                             _t('personal_info'),
@@ -578,14 +595,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             flex: 3,
                             child: Text(
                               _t('email'),
-                              style: const TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.w500),
+                              style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w500),
                             ),
                           ),
                           Expanded(
                             flex: 7,
                             child: Text(
-                              student?.email ?? 'sathsarani.saubhagya2025@gmail.com',
-                              style: TextStyle(fontSize: 13, color: textSecondaryColor, fontWeight: FontWeight.w600),
+                              student?.email ??
+                                  'sathsarani.saubhagya2025@gmail.com',
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: textSecondaryColor,
+                                  fontWeight: FontWeight.w600),
                             ),
                           ),
                         ],
@@ -597,14 +621,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             flex: 3,
                             child: Text(
                               _t('phone'),
-                              style: const TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.w500),
+                              style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w500),
                             ),
                           ),
                           Expanded(
                             flex: 7,
                             child: Text(
                               student?.phone ?? '+94 74 0910955',
-                              style: TextStyle(fontSize: 13, color: textSecondaryColor, fontWeight: FontWeight.w600),
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: textSecondaryColor,
+                                  fontWeight: FontWeight.w600),
                             ),
                           ),
                         ],
@@ -623,7 +653,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
+                        color:
+                            Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       )
@@ -634,7 +665,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.school_outlined, color: textPrimaryColor, size: 20),
+                          Icon(Icons.school_outlined,
+                              color: textPrimaryColor, size: 20),
                           const SizedBox(width: 8),
                           Text(
                             _t('academic_summary'),
@@ -653,14 +685,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             flex: 3,
                             child: Text(
                               _t('school'),
-                              style: const TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.w500),
+                              style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w500),
                             ),
                           ),
                           Expanded(
                             flex: 7,
                             child: Text(
-                              student?.school ?? 'A/Swarnapali Balika girls school',
-                              style: TextStyle(fontSize: 13, color: textSecondaryColor, fontWeight: FontWeight.w600),
+                              student?.school ??
+                                  'A/Swarnapali Balika girls school',
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: textSecondaryColor,
+                                  fontWeight: FontWeight.w600),
                             ),
                           ),
                         ],
@@ -672,14 +711,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             flex: 3,
                             child: Text(
                               _t('olevel_year'),
-                              style: const TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.w500),
+                              style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w500),
                             ),
                           ),
                           Expanded(
                             flex: 7,
                             child: Text(
                               '${student?.oLevelYear ?? 2026}',
-                              style: TextStyle(fontSize: 13, color: textSecondaryColor, fontWeight: FontWeight.w600),
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: textSecondaryColor,
+                                  fontWeight: FontWeight.w600),
                             ),
                           ),
                         ],
@@ -696,12 +741,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: ElevatedButton(
                     onPressed: () async {
                       if (student?.uid != null) {
-                        await context.read<QuizProvider>().loadHighestScores(student!.uid!);
+                        await context
+                            .read<QuizProvider>()
+                            .loadHighestScores(student!.uid!);
                       }
                       if (context.mounted) {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const ResultsScreen()),
+                          MaterialPageRoute(
+                              builder: (_) => const ResultsScreen()),
                         );
                       }
                     },
@@ -709,14 +757,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       backgroundColor: const Color(0xFF1E3C72),
                       foregroundColor: Colors.white,
                       elevation: 4,
-                      shadowColor: const Color(0xFF1E3C72).withValues(alpha: 0.4),
+                      shadowColor:
+                          const Color(0xFF1E3C72).withValues(alpha: 0.4),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
                     child: Text(
                       _t('quiz_result'),
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                      style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5),
                     ),
                   ),
                 ),
@@ -733,13 +785,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       if (context.mounted) {
                         Navigator.pushAndRemoveUntil(
                           context,
-                          MaterialPageRoute(builder: (_) => const WelcomeOrLoginPage()),
+                          MaterialPageRoute(
+                              builder: (_) => const WelcomeOrLoginPage()),
                           (route) => false,
                         );
                       }
                     },
-                    icon: const Icon(Icons.logout_rounded, color: Colors.redAccent),
-                    label: Text(_t('logout'), style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+                    icon: const Icon(Icons.logout_rounded,
+                        color: Colors.redAccent),
+                    label: Text(_t('logout'),
+                        style: const TextStyle(
+                            color: Colors.redAccent,
+                            fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],
@@ -751,10 +808,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (!widget.isEmbedded) {
       return Scaffold(
-        backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF4F6FC),
+        backgroundColor:
+            isDark ? const Color(0xFF121212) : const Color(0xFFF4F6FC),
         appBar: AppBar(
-          title: Text(_t('profile'), style: const TextStyle(fontWeight: FontWeight.bold)),
-          backgroundColor: isDark ? const Color(0xFF1E1E1E) : const Color(0xFF1E3C72),
+          title: Text(_t('profile'),
+              style: const TextStyle(fontWeight: FontWeight.bold)),
+          backgroundColor:
+              isDark ? const Color(0xFF1E1E1E) : const Color(0xFF1E3C72),
           foregroundColor: Colors.white,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -765,7 +825,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     }
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF121212) : const Color(0xFFF4F6FC),
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF4F6FC),
       body: bodyContent,
     );
   }
